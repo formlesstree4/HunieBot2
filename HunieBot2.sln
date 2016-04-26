@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HunieBot2", "HunieBot2", "{D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discord.Net", "Discord.Net", "{E7D0B53B-C40F-4931-81AD-863CA53D778D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net", "..\..\Discord-dot-net\src\Discord.Net.Net45\Discord.Net.csproj", "{8D71A857-879A-4A10-859E-5FF824ED6688}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.Host", "HunieBot.Host\HunieBot.Host.csproj", "{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HunieBot Implementations", "HunieBot Implementations", "{AB3507BF-1E81-40A2-B58E-70E9A4B9E578}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.HelloWorld", "HunieBot.HelloWorld\HunieBot.HelloWorld.csproj", "{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HunieBot UI", "HunieBot UI", "{9D2D648D-18AA-422D-8217-04EB6B38C975}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot2.Console", "HunieBot2.Console\HunieBot2.Console.csproj", "{7F402D52-E4AA-4777-BA7B-C87A6925D65F}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\Discord-dot-net\src\Discord.Net.Shared\Discord.Net.Shared.projitems*{8d71a857-879a-4a10-859e-5ff824ed6688}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		TestResponses|Any CPU = TestResponses|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.TestResponses|Any CPU.ActiveCfg = TestResponses|Any CPU
+		{8D71A857-879A-4A10-859E-5FF824ED6688}.TestResponses|Any CPU.Build.0 = TestResponses|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8D71A857-879A-4A10-859E-5FF824ED6688} = {E7D0B53B-C40F-4931-81AD-863CA53D778D}
+		{8D7E0C36-E16A-442F-AD6B-6E8B2D922B34} = {D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}
+		{AB3507BF-1E81-40A2-B58E-70E9A4B9E578} = {D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}
+		{3BCF8FE6-01CA-4745-8ADC-08F1BC39B151} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
+		{9D2D648D-18AA-422D-8217-04EB6B38C975} = {D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}
+		{7F402D52-E4AA-4777-BA7B-C87A6925D65F} = {9D2D648D-18AA-422D-8217-04EB6B38C975}
+	EndGlobalSection
+EndGlobal
