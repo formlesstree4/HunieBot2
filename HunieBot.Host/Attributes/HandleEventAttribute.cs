@@ -30,6 +30,7 @@ namespace HunieBot.Host.Attributes
         /// <param name="permissions"><see cref="UserPermissions"/></param>
         public HandleEventAttribute(CommandEvent @event, UserPermissions permissions = UserPermissions.User)
         {
+            if((@event & CommandEvent.CommandReceived) != 0) throw new ArgumentException($"{nameof(HandleEventAttribute)} cannot handle {nameof(CommandEvent.CommandReceived)}. Please use {nameof(HandleCommandAttribute)} for handling commands.");
             Events = @event;
             Permissions = permissions;
         }

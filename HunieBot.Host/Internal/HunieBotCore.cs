@@ -13,17 +13,18 @@ namespace HunieBot.Host.Internal
     internal sealed class HunieBotCore
     {
 
-        [HandleEvent(CommandEvent.CommandReceived | CommandEvent.PrivateMessageReceived, UserPermissions.Owner)]
-        public async Task ActiveMembers(IHunieCommand command)
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.PrivateMessageReceived, UserPermissions.User, "ping")]
+        public async Task HandlePrivatePing(IHunieCommand command)
         {
-            switch (command.Command.ToLowerInvariant())
-            {
-                case "ping":
-                    await command.User.SendMessage("pong");
-                    break;
-            }
+            await command.User.SendMessage("pong (private)");
         }
 
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.User, "ping")]
+        public async Task HandlePublicPing(IHunieCommand command)
+        {
+            await command.User.SendMessage("pong (public)");
+        }
+        
     }
 
 }

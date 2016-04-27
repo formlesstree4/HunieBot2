@@ -42,6 +42,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\HandleCommandAttribute.cs" />
     <Compile Include="Attributes\HandleEventAttribute.cs" />
     <Compile Include="Attributes\HunieBotAttribute.cs" />
     <Compile Include="Enumerations\UserPermissions.cs" />

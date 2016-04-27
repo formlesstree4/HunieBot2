@@ -195,7 +195,14 @@ namespace HunieBot.Host
 
         private async void _incomingMessage(object sender, MessageEventArgs e)
         {
-            await HandleEvent(e, CommandEvent.MessageReceived);
+            if (e.Channel.IsPrivate)
+            {
+                await HandleEvent(e, CommandEvent.PrivateMessageReceived);
+            }
+            else
+            {
+                await HandleEvent(e, CommandEvent.MessageReceived);
+            }
         }
 
         private async void _userUnbanned(object sender, UserEventArgs e)
@@ -248,14 +255,11 @@ namespace HunieBot.Host
             IHunieEvent message;
             switch (eventType)
             {
+                case CommandEvent.PrivateMessageReceived:
                 case CommandEvent.MessageReceived:
                     var mea = (args as MessageEventArgs);
                     if (mea == null) return;
                     message = mea.ToHunieMessage(_discordClientConnection);
-                    if (mea.Channel.IsPrivate)
-                    {
-                        eventType |= CommandEvent.PrivateMessageReceived;
-                    }
                     if (mea.Message.Text[0].Equals(Configuration.CommandCharacter))
                     {
                         eventType |= CommandEvent.CommandReceived;
@@ -306,7 +310,8 @@ namespace HunieBot.Host
         {
             private readonly DynamicMethodInjectorFactory _methodInjectorFactory = new DynamicMethodInjectorFactory();
             private readonly HunieBotAttribute _hba;
-            private readonly IList<HunieMetaData> _commandMetaData;
+            private readonly IList<HunieEventMetaData> _eventMetaData;
+            private readonly IList<HunieCommandMetaData> _commandMetaData;
             private readonly ILogging _logger;
             private readonly IKernel _kernel;
             private readonly IHunieUserPermissions _permissions;
@@ -336,7 +341,8 @@ namespace HunieBot.Host
             /// <param name="permissions"><see cref="IHunieUserPermissions"/> instance</param>
             public HunieWrapper(HunieBotAttribute botAttribute, object bot, ILogging logger, IKernel kernel, IHunieUserPermissions permissions)
             {
-                _commandMetaData = new List<HunieMetaData>();
+                _eventMetaData = new List<HunieEventMetaData>();
+                _commandMetaData = new List<HunieCommandMetaData>();
                 _hba = botAttribute;
                 _instance = bot;
                 _kernel = kernel;
@@ -350,8 +356,23 @@ namespace HunieBot.Host
                 foreach (var method in _instance.GetType().GetMethods())
                 {
                     var hea = method.GetCustomAttribute<HandleEventAttribute>(false);
-                    if (hea == null) continue;
-                    _commandMetaData.Add(new HunieMetaData(method, _methodInjectorFactory.Create(method), hea));
+                    var hca = method.GetCustomAttribute<HandleCommandAttribute>(false);
+                    if (hea != null && hca != null)
+                    {
+                        throw new InvalidOperationException($"You may not have {nameof(HandleEventAttribute)} and {nameof(HandleCommandAttribute)} on the same method ({method.Name}).");
+                    }
+                    if (hea == null && hca == null) continue; // This method does not have attributes we care about.
+
+                    if(hea != null)
+                    {
+                        _eventMetaData.Add(new HunieEventMetaData(method, _methodInjectorFactory.Create(method), hea));
+                        continue;
+                    }
+                    if(hca != null)
+                    {
+                        _commandMetaData.Add(new HunieCommandMetaData(method, _methodInjectorFactory.Create(method), hca));
+                        continue;
+                    }
                 }
             }
 
@@ -362,14 +383,45 @@ namespace HunieBot.Host
             /// <param name="commandEvent">The <see cref="CommandEvent"/> that has occurred</param>
             internal async Task HandleEvent(IHunieEvent hEvent, CommandEvent commandEvent)
             {
-                foreach (var methodData in (from c in _commandMetaData
-                                            where (c.Attribute.Events & commandEvent) != 0 &&
+                // So, basically, we're going to check CommandEvent to see if it is a CommandReceived type.
+                // If it is, we're going to iterate across the command list instead of the
+                // event list. It makes pretty logical sense.
+                if ((commandEvent & CommandEvent.CommandReceived) != 0)
+                {
+                    await HandleAsCommand(hEvent, commandEvent);
+                }
+                else
+                {
+                    await HandleAsEvent(hEvent, commandEvent);
+                }
+            }
+
+            private async Task HandleAsEvent(IHunieEvent hEvent, CommandEvent commandEvent)
+            {
+                foreach (var methodData in (from c in _eventMetaData
+                                            where (c.Attribute.Events & commandEvent) == commandEvent &&
                                             (hEvent.User != null && (_permissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
                                             select c))
                 {
                     await Task.Run(() =>
                     {
                         methodData.MethodInjector(_instance, BuildParameterArray(methodData.Parameters, hEvent, commandEvent));
+                    });
+                }
+            }
+
+            private async Task HandleAsCommand(IHunieEvent hEvent, CommandEvent commandEvent)
+            {
+                var cmd = hEvent as IHunieCommand;
+                foreach (var methodData in (from c in _commandMetaData
+                                            where (c.Attribute.Events & commandEvent) == commandEvent &&
+                                            (hEvent.User != null && (_permissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
+                                            c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase)
+                                            select c))
+                {
+                    await Task.Run(() =>
+                    {
+                        methodData.MethodInjector(_instance, BuildParameterArray(methodData.Parameters, cmd, commandEvent));
                     });
                 }
             }
@@ -433,18 +485,17 @@ namespace HunieBot.Host
         }
 
         /// <summary>
-        ///     Property bag of related metadata.
+        ///     Property bag of related metadata for dealing with <see cref="HandleEventAttribute"/>.
         /// </summary>
-        private sealed class HunieMetaData
+        private sealed class HunieEventMetaData
         {
-            private readonly Lazy<ParameterInfo[]> _lazyLoadParameters;
             public MethodInfo Method { get; }
             public MethodInjector MethodInjector { get; }
             public HandleEventAttribute Attribute { get; }
             public ParameterInfo[] Parameters { get; }
 
 
-            public HunieMetaData(MethodInfo mi, MethodInjector mj, HandleEventAttribute hea)
+            public HunieEventMetaData(MethodInfo mi, MethodInjector mj, HandleEventAttribute hea)
             {
                 Method = mi;
                 MethodInjector = mj;
@@ -458,6 +509,32 @@ namespace HunieBot.Host
                 ; // ToDo
             }
 
+        }
+
+        /// <summary>
+        ///     Property bag of related metadata for dealing with <see cref="HandleCommandAttribute"/>.
+        /// </summary>
+        private sealed class HunieCommandMetaData
+        {
+            public MethodInfo Method { get; }
+            public MethodInjector MethodInjector { get; }
+            public HandleCommandAttribute Attribute { get; }
+            public ParameterInfo[] Parameters { get; }
+
+
+            public HunieCommandMetaData(MethodInfo mi, MethodInjector mj, HandleCommandAttribute hca)
+            {
+                Method = mi;
+                MethodInjector = mj;
+                Attribute = hca;
+                Parameters = Method.GetParameters();
+                ValidateParameters();
+            }
+
+            private void ValidateParameters()
+            {
+                ; // ToDo
+            }
         }
 
     }
