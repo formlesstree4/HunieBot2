@@ -63,7 +63,12 @@ namespace HunieBot.Host.Enumerations
         /// <summary>
         ///     A command has been received.
         /// </summary>
-        CommandReceived = 1024
+        CommandReceived = 1024,
+
+        /// <summary>
+        ///     A private message has been received.
+        /// </summary>
+        PrivateMessageReceived = 2048
 
     }
 

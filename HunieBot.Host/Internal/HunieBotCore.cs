@@ -13,7 +13,7 @@ namespace HunieBot.Host.Internal
     internal sealed class HunieBotCore
     {
 
-        [HandleEvent(CommandEvent.CommandReceived, UserPermissions.Owner)]
+        [HandleEvent(CommandEvent.CommandReceived | CommandEvent.PrivateMessageReceived, UserPermissions.Owner)]
         public async Task ActiveMembers(IHunieCommand command)
         {
             switch (command.Command.ToLowerInvariant())

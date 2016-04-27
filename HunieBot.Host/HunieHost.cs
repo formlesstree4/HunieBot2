@@ -252,9 +252,13 @@ namespace HunieBot.Host
                     var mea = (args as MessageEventArgs);
                     if (mea == null) return;
                     message = mea.ToHunieMessage(_discordClientConnection);
+                    if (mea.Channel.IsPrivate)
+                    {
+                        eventType |= CommandEvent.PrivateMessageReceived;
+                    }
                     if (mea.Message.Text[0].Equals(Configuration.CommandCharacter))
                     {
-                        eventType = CommandEvent.CommandReceived;
+                        eventType |= CommandEvent.CommandReceived;
                         message = new HunieCommand((IHunieMessage)message);
                     }
                     break;
