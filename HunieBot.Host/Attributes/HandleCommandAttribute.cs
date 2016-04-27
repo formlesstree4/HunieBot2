@@ -36,7 +36,7 @@ namespace HunieBot.Host.Attributes
         /// <param name="permissions">The <see cref="UserPermissions"/> level of who may invoke this command</param>
         public HandleCommandAttribute(CommandEvent @event, UserPermissions permissions = UserPermissions.User, params string[] commands)
         {
-            ValidateParameters(@event);
+            ValidateParameters(@event, commands);
             Events = @event;
             Permissions = permissions;
             Commands = commands;
@@ -48,11 +48,12 @@ namespace HunieBot.Host.Attributes
         ///     Validates incoming parameters.
         /// </summary>
         /// <param name="event"><see cref="CommandEvent"/></param>
-        private void ValidateParameters(CommandEvent @event)
+        private void ValidateParameters(CommandEvent @event, string[] commands)
         {
             // Basically, the only VALID types of events are
             // going to be: CommandReceived, MessageReceived, and PrivateMessageReceived.
             // However, we MUST have CommandReceived at ALL times.
+            if (commands.Length == 0) throw new ArgumentException();
             if ((@event & CommandEvent.CommandReceived) == 0) throw new ArgumentException();
             if ((@event & CommandEvent.ChannelCreated) != 0) throw new ArgumentException();
             if ((@event & CommandEvent.ChannelDeleted) != 0) throw new ArgumentException();

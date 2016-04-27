@@ -376,6 +376,8 @@ namespace HunieBot.Host
                 }
             }
 
+
+
             /// <summary>
             ///     Propigates a <see cref="CommandEvent"/> to any applicable <see cref="HandleEventAttribute"/> methods.
             /// </summary>
@@ -396,6 +398,12 @@ namespace HunieBot.Host
                 }
             }
 
+            /// <summary>
+            ///     Passes <see cref="IHunieEvent"/> through to <see cref="HunieEventMetaData"/> instances for invocation.
+            /// </summary>
+            /// <param name="hEvent"><see cref="IHunieEvent"/></param>
+            /// <param name="commandEvent"><see cref="CommandEvent"/> that invoked <see cref="HandleAsEvent(IHunieEvent, CommandEvent)"/></param>
+            /// <returns>A promise to handle the event</returns>
             private async Task HandleAsEvent(IHunieEvent hEvent, CommandEvent commandEvent)
             {
                 foreach (var methodData in (from c in _eventMetaData
@@ -410,6 +418,12 @@ namespace HunieBot.Host
                 }
             }
 
+            /// <summary>
+            ///     Passes <see cref="IHunieEvent"/> through to <see cref="HunieCommandMetaData"/> instances for invocation.
+            /// </summary>
+            /// <param name="hEvent"><see cref="IHunieEvent"/></param>
+            /// <param name="commandEvent"><see cref="CommandEvent"/> that invoked <see cref="HandleAsCommand(IHunieEvent, CommandEvent)"/></param>
+            /// <returns>A promise to handle the command</returns>
             private async Task HandleAsCommand(IHunieEvent hEvent, CommandEvent commandEvent)
             {
                 var cmd = hEvent as IHunieCommand;
@@ -533,7 +547,11 @@ namespace HunieBot.Host
 
             private void ValidateParameters()
             {
-                ; // ToDo
+                foreach (var pType in Parameters.Select(c => c.ParameterType))
+                {
+                    if (pType == typeof(IHunieCommand)) return;
+                }
+                throw new ArgumentException();
             }
         }
 
