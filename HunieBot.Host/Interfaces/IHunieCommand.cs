@@ -15,7 +15,18 @@
         /// <summary>
         ///     Gets the parameters of the command that were passed in.
         /// </summary>
+        /// <remarks>
+        ///     Parsed from <see cref="Discord.Message.Text"/>
+        /// </remarks>
         string[] Parameters { get; }
+
+        /// <summary>
+        ///     Gets the parameters of the command that were passed in.
+        /// </summary>
+        /// <remarks>
+        ///     Parsed from <see cref="Discord.Message.RawText"/>
+        /// </remarks>
+        string[] RawParameters { get; }
 
     }
 }

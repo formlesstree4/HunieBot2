@@ -17,8 +17,8 @@ namespace HunieBot.Host.Injection
         public override void Load()
         {
             Bind<ILogging>().ToMethod(c => new Implementations.DebugLogger());
-            Unbind<IKernel>();
-            Bind<IKernel>().ToMethod(c => new StandardKernel(new Debug()));
+            //Unbind<IKernel>();
+            //Bind<IKernel>().ToMethod(c => new StandardKernel(new Debug()));
         }
     }
 }

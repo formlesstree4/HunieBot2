@@ -189,6 +189,7 @@ namespace HunieBot.Host
         {
             _ninject.Unbind<IHunieUserPermissions>();
             _ninject.Bind<IHunieUserPermissions>().ToConstant(new ReadOnlyHunieUserPermissions(_userPermissions));
+            _ninject.Bind<IHunieHostMetaData>().ToConstant(new HunieHostMetaData(((List<HunieWrapper>)_wrappers).AsReadOnly()));
         }
         
         #region Discord Events
@@ -303,10 +304,36 @@ namespace HunieBot.Host
 
         #endregion
 
+
+
+        /// <summary>
+        ///     Metadata about <see cref="HunieHost"/>.
+        /// </summary>
+        private sealed class HunieHostMetaData : IHunieHostMetaData
+        {
+
+            /// <summary>
+            ///     Gets a collection of <see cref="HunieWrapper"/> instances.
+            /// </summary>
+            public IReadOnlyCollection<HunieWrapper> Commands { get; }
+
+
+
+            /// <summary>
+            ///     Creates a new instance of <see cref="HunieHostMetaData"/>.
+            /// </summary>
+            /// <param name="cmdWrappers">A read only collection of <see cref="HunieWrapper"/></param>
+            public HunieHostMetaData(IReadOnlyCollection<HunieWrapper> cmdWrappers)
+            {
+                Commands = cmdWrappers;
+            }
+
+        }
+
         /// <summary>
         ///     Wraps around a <see cref="HunieBotAttribute"/> flagged object and handles enumerating methods as appropriate.
         /// </summary>
-        private sealed class HunieWrapper
+        internal sealed class HunieWrapper
         {
             private readonly DynamicMethodInjectorFactory _methodInjectorFactory = new DynamicMethodInjectorFactory();
             private readonly HunieBotAttribute _hba;
@@ -328,6 +355,23 @@ namespace HunieBot.Host
             ///     Gets the type of this <see cref="HunieWrapper"/>.
             /// </summary>
             public Type Type => _instance.GetType();
+
+            /// <summary>
+            ///     Returns the commands that this <see cref="HunieWrapper"/> supports.
+            /// </summary>
+            public IEnumerable<string> Commands
+            {
+                get
+                {
+                    foreach (var hcmd in _commandMetaData)
+                    {
+                        foreach (var cmd in hcmd.Attribute.Commands)
+                        {
+                            yield return cmd;
+                        }
+                    }
+                }
+            }
 
 
 
