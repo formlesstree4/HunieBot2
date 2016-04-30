@@ -53,18 +53,20 @@
     <Compile Include="Enumerations\CommandEvent.cs" />
     <Compile Include="HunieMessage.cs" />
     <Compile Include="Injection\Debug.cs" />
-    <Compile Include="Injection\Implementations\DebugLogger.cs" />
-    <Compile Include="Injection\Implementations\ReleaseLogger.cs" />
+    <Compile Include="Injection\Implementations\Logging\DebugLogger.cs" />
+    <Compile Include="Injection\Implementations\Permissions\HunieCommandPermissions.cs" />
+    <Compile Include="Injection\Implementations\Logging\ReleaseLogger.cs" />
     <Compile Include="Injection\Release.cs" />
     <Compile Include="Interfaces\IHunieCommand.cs" />
+    <Compile Include="Interfaces\IHunieCommandPermissions.cs" />
     <Compile Include="Interfaces\IHunieEvent.cs" />
     <Compile Include="Interfaces\IHunieHostMetaData.cs" />
     <Compile Include="Interfaces\IHunieMessage.cs" />
     <Compile Include="Interfaces\IHunieUserPermissions.cs" />
     <Compile Include="Interfaces\ILogging.cs" />
     <Compile Include="Internal\HunieBotCore.cs" />
-    <Compile Include="Permissions\HunieUserPermissions.cs" />
-    <Compile Include="Permissions\ReadOnlyHunieUserPermissions.cs" />
+    <Compile Include="Injection\Implementations\Permissions\HunieUserPermissions.cs" />
+    <Compile Include="Injection\Implementations\Permissions\ReadOnlyHunieUserPermissions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

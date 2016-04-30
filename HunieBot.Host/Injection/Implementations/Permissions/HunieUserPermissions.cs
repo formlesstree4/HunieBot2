@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.IO;
 
-namespace HunieBot.Host.Permissions
+namespace HunieBot.Host.Injection.Implementations.Permissions
 {
     internal sealed class HunieUserPermissions : IHunieUserPermissions
     {

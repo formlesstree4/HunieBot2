@@ -2,7 +2,7 @@
 using HunieBot.Host.Interfaces;
 using System;
 
-namespace HunieBot.Host.Permissions
+namespace HunieBot.Host.Injection.Implementations.Permissions
 {
     internal sealed class ReadOnlyHunieUserPermissions : IHunieUserPermissions
     {

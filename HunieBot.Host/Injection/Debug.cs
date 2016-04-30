@@ -1,5 +1,6 @@
-﻿using HunieBot.Host.Interfaces;
-using Ninject;
+﻿using HunieBot.Host.Injection.Implementations.Logging;
+using HunieBot.Host.Injection.Implementations.Permissions;
+using HunieBot.Host.Interfaces;
 using Ninject.Modules;
 
 namespace HunieBot.Host.Injection
@@ -16,9 +17,9 @@ namespace HunieBot.Host.Injection
         /// </summary>
         public override void Load()
         {
-            Bind<ILogging>().ToMethod(c => new Implementations.DebugLogger());
-            //Unbind<IKernel>();
-            //Bind<IKernel>().ToMethod(c => new StandardKernel(new Debug()));
+            Bind<ILogging>().ToMethod(c => new DebugLogger());
+            Bind<IHunieUserPermissions>().ToConstant(new HunieUserPermissions());
+            Bind<IHunieCommandPermissions>().ToConstant(new HunieCommandPermissions());
         }
     }
 }

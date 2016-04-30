@@ -68,7 +68,12 @@ namespace HunieBot.Host.Enumerations
         /// <summary>
         ///     A private message has been received.
         /// </summary>
-        PrivateMessageReceived = 2048
+        PrivateMessageReceived = 2048,
+
+        /// <summary>
+        ///     A private or public message has been received.
+        /// </summary>
+        AnyMessageReceived = PrivateMessageReceived | MessageReceived
 
     }
 

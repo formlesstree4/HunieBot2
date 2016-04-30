@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace HunieBot.Host.Injection.Implementations
+namespace HunieBot.Host.Injection.Implementations.Logging
 {
 
     /// <summary>

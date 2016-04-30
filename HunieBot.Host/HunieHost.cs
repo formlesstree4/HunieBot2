@@ -2,9 +2,8 @@
 using HunieBot.Host.Attributes;
 using HunieBot.Host.Enumerations;
 using HunieBot.Host.Injection;
+using HunieBot.Host.Injection.Implementations.Permissions;
 using HunieBot.Host.Interfaces;
-using HunieBot.Host.Internal;
-using HunieBot.Host.Permissions;
 using Ninject;
 using Ninject.Injection;
 using Ninject.Modules;
@@ -26,8 +25,10 @@ namespace HunieBot.Host
         private readonly static string HunieBotDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HunieBot");
         private readonly static string ConfigurationFile = Path.Combine(HunieBotDataFolder, "configuration.json");
         private readonly static string UserPermissionsFile = Path.Combine(HunieBotDataFolder, "userpermissions.json");
+        private readonly static string CommandPermissionsFile = Path.Combine(HunieBotDataFolder, "commandpermissions.json");
 
 
+        private readonly IHunieCommandPermissions _commandPermissions;
         private readonly IHunieUserPermissions _userPermissions;
         private readonly INinjectModule _loadedModule;
         private readonly IKernel _ninject;
@@ -64,9 +65,11 @@ namespace HunieBot.Host
             _discordClientConnection = new DiscordClient(dc);
             _ninject = new StandardKernel(_loadedModule);
             _logger = _ninject.Get<ILogging>();
-            _userPermissions = _ninject.Get<HunieUserPermissions>();
+            _userPermissions = _ninject.Get<IHunieUserPermissions>();
+            _commandPermissions = _ninject.Get<IHunieCommandPermissions>();
             _wrappers = new List<HunieWrapper>();
             _userPermissions.Load(UserPermissionsFile);
+            _commandPermissions.Load(CommandPermissionsFile);
             Configuration.Load(ConfigurationFile);
             LoadInternalBotInstances();
             SetAdditionalBindings();
@@ -102,6 +105,7 @@ namespace HunieBot.Host
         public async Task Stop()
         {
             _userPermissions.Save(UserPermissionsFile);
+            _commandPermissions.Save(CommandPermissionsFile);
             Configuration.Save(ConfigurationFile);
             await _discordClientConnection.Disconnect();
             _discordClientConnection.MessageReceived -= _incomingMessage;
@@ -126,7 +130,7 @@ namespace HunieBot.Host
             var hea = t.GetCustomAttribute<HunieBotAttribute>();
             if (hea == null) return;
             var instance = _ninject.Get(t);
-            var wrapper = new HunieWrapper(hea, instance, _ninject.Get<ILogging>(), _ninject.Get<IKernel>(), _ninject.Get<IHunieUserPermissions>());
+            var wrapper = new HunieWrapper(hea, instance, _ninject.Get<ILogging>(), _ninject.Get<IKernel>(), _ninject.Get<IHunieUserPermissions>(), _ninject.Get<IHunieCommandPermissions>());
             _wrappers.Add(wrapper);
         }
 
@@ -187,11 +191,13 @@ namespace HunieBot.Host
         }
         private void SetAdditionalBindings()
         {
-            _ninject.Unbind<IHunieUserPermissions>();
+            _ninject.Unbind<IHunieUserPermissions>(); // Initially, we bound this to a read/write version. We're going to expose a readonly version now.
             _ninject.Bind<IHunieUserPermissions>().ToConstant(new ReadOnlyHunieUserPermissions(_userPermissions));
             _ninject.Bind<IHunieHostMetaData>().ToConstant(new HunieHostMetaData(((List<HunieWrapper>)_wrappers).AsReadOnly()));
         }
         
+
+
         #region Discord Events
 
         private async void _incomingMessage(object sender, MessageEventArgs e)
@@ -261,7 +267,7 @@ namespace HunieBot.Host
                     var mea = (args as MessageEventArgs);
                     if (mea == null) return;
                     message = mea.ToHunieMessage(_discordClientConnection);
-                    if (mea.Message.Text[0].Equals(Configuration.CommandCharacter))
+                    if (!string.IsNullOrWhiteSpace(mea.Message.Text) && mea.Message.Text[0].Equals(Configuration.CommandCharacter))
                     {
                         eventType |= CommandEvent.CommandReceived;
                         message = new HunieCommand((IHunieMessage)message);
@@ -341,7 +347,8 @@ namespace HunieBot.Host
             private readonly IList<HunieCommandMetaData> _commandMetaData;
             private readonly ILogging _logger;
             private readonly IKernel _kernel;
-            private readonly IHunieUserPermissions _permissions;
+            private readonly IHunieCommandPermissions _commandPermissions;
+            private readonly IHunieUserPermissions _userPermissions;
             private readonly object _instance;
 
 
@@ -382,15 +389,16 @@ namespace HunieBot.Host
             /// <param name="bot">The instance of the bot being wrapped</param>
             /// <param name="logger">An instance of <see cref="ILogging"/> for reporting purposes</param>
             /// <param name="kernel">An instance of <see cref="IKernel"/> that we are going to (ab)use for method-based parameter injection</param>
-            /// <param name="permissions"><see cref="IHunieUserPermissions"/> instance</param>
-            public HunieWrapper(HunieBotAttribute botAttribute, object bot, ILogging logger, IKernel kernel, IHunieUserPermissions permissions)
+            /// <param name="userPermissions"><see cref="IHunieUserPermissions"/> instance</param>
+            public HunieWrapper(HunieBotAttribute botAttribute, object bot, ILogging logger, IKernel kernel, IHunieUserPermissions userPermissions, IHunieCommandPermissions commandPermissions)
             {
                 _eventMetaData = new List<HunieEventMetaData>();
                 _commandMetaData = new List<HunieCommandMetaData>();
                 _hba = botAttribute;
                 _instance = bot;
                 _kernel = kernel;
-                _permissions = permissions;
+                _userPermissions = userPermissions;
+                _commandPermissions = commandPermissions;
                 _logger = logger;
 
                 // So, this instance is supposed to have some information.
@@ -452,7 +460,7 @@ namespace HunieBot.Host
             {
                 foreach (var methodData in (from c in _eventMetaData
                                             where (c.Attribute.Events & commandEvent) == commandEvent &&
-                                            (hEvent.User != null && (_permissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
+                                            (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
                                             select c))
                 {
                     await Task.Run(() =>
@@ -473,8 +481,9 @@ namespace HunieBot.Host
                 var cmd = hEvent as IHunieCommand;
                 foreach (var methodData in (from c in _commandMetaData
                                             where (c.Attribute.Events & commandEvent) == commandEvent &&
-                                            (hEvent.User != null && (_permissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
-                                            c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase)
+                                            (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
+                                            c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase) &&
+                                            (hEvent.Channel.IsPrivate || _commandPermissions.GetCommandListenerStatus(cmd.Command, hEvent.Server.Id, hEvent.Channel.Id))
                                             select c))
                 {
                     await Task.Run(() =>
