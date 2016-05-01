@@ -36,6 +36,15 @@
         bool GetCommandListenerStatus(string command, ulong server, ulong channel);
 
         /// <summary>
+        ///     Overload used primarily for commands that have aliases.
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <param name="server"></param>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        bool GetCommandListenerStatus(string[] commands, ulong server, ulong channel);
+
+        /// <summary>
         ///     Saves the current permissions to file.
         /// </summary>
         /// <param name="file">The file to save the permissions to</param>

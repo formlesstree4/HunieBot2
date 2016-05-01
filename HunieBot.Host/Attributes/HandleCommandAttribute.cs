@@ -1,5 +1,6 @@
 ﻿using HunieBot.Host.Enumerations;
 using System;
+using System.Linq;
 
 namespace HunieBot.Host.Attributes
 {
@@ -64,6 +65,7 @@ namespace HunieBot.Host.Attributes
             if ((@event & CommandEvent.UserDeparted) != 0) throw new ArgumentException();
             if ((@event & CommandEvent.UserJoined) != 0) throw new ArgumentException();
             if ((@event & CommandEvent.UserUnbanned) != 0) throw new ArgumentException();
+            if (commands.Any(c => c.Any(char.IsWhiteSpace))) throw new ArgumentException("Commands may not have any whitespace", nameof(commands));
         }
 
     }

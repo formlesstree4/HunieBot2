@@ -12,30 +12,19 @@ namespace HunieBot.Host.Injection.Implementations.Permissions
     /// </summary>
     internal sealed class HunieCommandPermissions : IHunieCommandPermissions
     {
-        private ConcurrentDictionary<InternalHunieCommandKey, bool> _commandFilters = new ConcurrentDictionary<InternalHunieCommandKey, bool>();
+        private ConcurrentDictionary<string, bool> _commandFilters = new ConcurrentDictionary<string, bool>();
 
 
         public bool GetCommandListenerStatus(string command, ulong server, ulong channel)
         {
-            var key = new InternalHunieCommandKey
-            {
-                //Host = host,
-                Command = command,
-                ServerID = server,
-                ChannelID = channel
-            };
-            return _commandFilters.GetOrAdd(key, false);
+            if (command.Equals("set_command_permission", StringComparison.OrdinalIgnoreCase)) return true; // hackhack
+            bool value;
+            if (!_commandFilters.TryGetValue(ComposeKey(command, server, channel), out value)) return false;
+            return value;
         }
         public void SetCommandListenerStatus(string command, ulong server, ulong channel, bool canListen)
         {
-            var key = new InternalHunieCommandKey
-            {
-                //Host = host,
-                Command = command,
-                ServerID = server,
-                ChannelID = channel
-            };
-            _commandFilters.AddOrUpdate(key, canListen, (c, b) => canListen);
+            _commandFilters.AddOrUpdate(ComposeKey(command, server, channel), canListen, (c, b) => canListen);
         }
         public string[] GetServerAndChannelCommands(ulong server, ulong channel)
         {
@@ -45,7 +34,7 @@ namespace HunieBot.Host.Injection.Implementations.Permissions
         public void Load(string file)
         {
             if (!File.Exists(file)) Save(file);
-            _commandFilters = JsonConvert.DeserializeObject<ConcurrentDictionary<InternalHunieCommandKey, bool>>(File.ReadAllText(file));
+            _commandFilters = JsonConvert.DeserializeObject<ConcurrentDictionary<string, bool>>(File.ReadAllText(file));
         }
         public void Save(string file)
         {
@@ -53,14 +42,17 @@ namespace HunieBot.Host.Injection.Implementations.Permissions
         }
 
 
-        private sealed class InternalHunieCommandKey
+        private string ComposeKey(string command, ulong server, ulong channel)
         {
-            public string Host { get; set; }
-            public string Command { get; set; }
-            public ulong ServerID { get; set; }
-            public ulong ChannelID { get; set; }
+            return $"{command}_{server}_{channel}";
         }
 
+        public bool GetCommandListenerStatus(string[] commands, ulong server, ulong channel)
+        {
+            foreach (var command in commands)
+                if (GetCommandListenerStatus(command, server, channel)) return true;
+            return false;
+        }
     }
 
 }

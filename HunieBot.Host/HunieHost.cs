@@ -9,6 +9,7 @@ using Ninject.Injection;
 using Ninject.Modules;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -64,6 +65,7 @@ namespace HunieBot.Host
 #endif
             _discordClientConnection = new DiscordClient(dc);
             _ninject = new StandardKernel(_loadedModule);
+            _ninject.Bind<DiscordClient>().ToConstant(_discordClientConnection);
             _logger = _ninject.Get<ILogging>();
             _userPermissions = _ninject.Get<IHunieUserPermissions>();
             _commandPermissions = _ninject.Get<IHunieCommandPermissions>();
@@ -71,6 +73,7 @@ namespace HunieBot.Host
             _userPermissions.Load(UserPermissionsFile);
             _commandPermissions.Load(CommandPermissionsFile);
             Configuration.Load(ConfigurationFile);
+            RegisterEvents();
             LoadInternalBotInstances();
             SetAdditionalBindings();
             FindHunieBotInstances();
@@ -86,16 +89,6 @@ namespace HunieBot.Host
         {
             await _discordClientConnection.Connect(Configuration.DiscordToken);
             _discordClientConnection.SetGame("I'm HunieBot! PM me \"!help\" for more details!");
-            _discordClientConnection.MessageReceived += _incomingMessage;
-            _discordClientConnection.UserJoined += _userJoined;
-            _discordClientConnection.UserLeft += _userLeft;
-            _discordClientConnection.JoinedServer += _joinedServer;
-            _discordClientConnection.LeftServer += _departedServer;
-            _discordClientConnection.UserBanned += _userBanned;
-            _discordClientConnection.UserUnbanned += _userUnbanned;
-            _discordClientConnection.ChannelCreated += _channelCreated;
-            _discordClientConnection.ChannelUpdated += _channelUpdated;
-            _discordClientConnection.ChannelDestroyed += _channelDestroyed;
         }
 
         /// <summary>
@@ -108,16 +101,6 @@ namespace HunieBot.Host
             _commandPermissions.Save(CommandPermissionsFile);
             Configuration.Save(ConfigurationFile);
             await _discordClientConnection.Disconnect();
-            _discordClientConnection.MessageReceived -= _incomingMessage;
-            _discordClientConnection.UserJoined -= _userJoined;
-            _discordClientConnection.UserLeft -= _userLeft;
-            _discordClientConnection.JoinedServer -= _joinedServer;
-            _discordClientConnection.LeftServer -= _departedServer;
-            _discordClientConnection.UserBanned -= _userBanned;
-            _discordClientConnection.UserUnbanned -= _userUnbanned;
-            _discordClientConnection.ChannelCreated -= _channelCreated;
-            _discordClientConnection.ChannelUpdated -= _channelUpdated;
-            _discordClientConnection.ChannelDestroyed -= _channelDestroyed;
         }
 
         /// <summary>
@@ -139,6 +122,7 @@ namespace HunieBot.Host
         /// </summary>
         public void Dispose()
         {
+            ReleaseEvents();
             _discordClientConnection.Dispose();
         }
 
@@ -183,7 +167,7 @@ namespace HunieBot.Host
         {
 
             // These are bindings for internal modules only.
-            _ninject.Bind<IHunieUserPermissions>().ToConstant(_userPermissions);
+            // _ninject.Bind<IHunieUserPermissions>().ToConstant(_userPermissions);
 
             // Let's create our internal instances.
             RegisterHunieBotType(typeof(Internal.HunieBotCore));
@@ -195,10 +179,42 @@ namespace HunieBot.Host
             _ninject.Bind<IHunieUserPermissions>().ToConstant(new ReadOnlyHunieUserPermissions(_userPermissions));
             _ninject.Bind<IHunieHostMetaData>().ToConstant(new HunieHostMetaData(((List<HunieWrapper>)_wrappers).AsReadOnly()));
         }
-        
+        private void RegisterEvents()
+        {
+            _discordClientConnection.Ready += _ready;
+            _discordClientConnection.MessageReceived += _incomingMessage;
+            _discordClientConnection.UserJoined += _userJoined;
+            _discordClientConnection.UserLeft += _userLeft;
+            _discordClientConnection.JoinedServer += _joinedServer;
+            _discordClientConnection.LeftServer += _departedServer;
+            _discordClientConnection.UserBanned += _userBanned;
+            _discordClientConnection.UserUnbanned += _userUnbanned;
+            _discordClientConnection.ChannelCreated += _channelCreated;
+            _discordClientConnection.ChannelUpdated += _channelUpdated;
+            _discordClientConnection.ChannelDestroyed += _channelDestroyed;
+        }
+        private void ReleaseEvents()
+        {
+            _discordClientConnection.Ready -= _ready;
+            _discordClientConnection.MessageReceived -= _incomingMessage;
+            _discordClientConnection.UserJoined -= _userJoined;
+            _discordClientConnection.UserLeft -= _userLeft;
+            _discordClientConnection.JoinedServer -= _joinedServer;
+            _discordClientConnection.LeftServer -= _departedServer;
+            _discordClientConnection.UserBanned -= _userBanned;
+            _discordClientConnection.UserUnbanned -= _userUnbanned;
+            _discordClientConnection.ChannelCreated -= _channelCreated;
+            _discordClientConnection.ChannelUpdated -= _channelUpdated;
+            _discordClientConnection.ChannelDestroyed -= _channelDestroyed;
+        }
 
 
         #region Discord Events
+
+        private async void _ready(object sender, EventArgs e)
+        {
+            await HandleEvent(e, CommandEvent.Connected);
+        }
 
         private async void _incomingMessage(object sender, MessageEventArgs e)
         {
@@ -262,6 +278,9 @@ namespace HunieBot.Host
             IHunieEvent message;
             switch (eventType)
             {
+                case CommandEvent.Connected:
+                    message = new HunieEvent(null, null, null, _discordClientConnection);
+                    break;
                 case CommandEvent.PrivateMessageReceived:
                 case CommandEvent.MessageReceived:
                     var mea = (args as MessageEventArgs);
@@ -381,6 +400,8 @@ namespace HunieBot.Host
             }
 
 
+            internal IReadOnlyCollection<HunieCommandMetaData> CommandMetadata => ((List<HunieCommandMetaData>)_commandMetaData).AsReadOnly();
+
 
             /// <summary>
             ///     Creates a new instance of <see cref="HunieWrapper"/> to wrap around an instance of a <see cref="HunieBotAttribute"/> class.
@@ -422,7 +443,8 @@ namespace HunieBot.Host
                     }
                     if(hca != null)
                     {
-                        _commandMetaData.Add(new HunieCommandMetaData(method, _methodInjectorFactory.Create(method), hca));
+                        var desc = method.GetCustomAttribute<DescriptionAttribute>();
+                        _commandMetaData.Add(new HunieCommandMetaData(method, _methodInjectorFactory.Create(method), hca, desc));
                         continue;
                     }
                 }
@@ -459,8 +481,8 @@ namespace HunieBot.Host
             private async Task HandleAsEvent(IHunieEvent hEvent, CommandEvent commandEvent)
             {
                 foreach (var methodData in (from c in _eventMetaData
-                                            where (c.Attribute.Events & commandEvent) == commandEvent &&
-                                            (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
+                                            where (c.Attribute.Events & commandEvent) == commandEvent // &&
+                                            // (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
                                             select c))
                 {
                     await Task.Run(() =>
@@ -483,7 +505,7 @@ namespace HunieBot.Host
                                             where (c.Attribute.Events & commandEvent) == commandEvent &&
                                             (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
                                             c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase) &&
-                                            (hEvent.Channel.IsPrivate || _commandPermissions.GetCommandListenerStatus(cmd.Command, hEvent.Server.Id, hEvent.Channel.Id))
+                                            (hEvent.Channel.IsPrivate || _commandPermissions.GetCommandListenerStatus(c.Attribute.Commands, hEvent.Server.Id, hEvent.Channel.Id))
                                             select c))
                 {
                     await Task.Run(() =>
@@ -554,7 +576,7 @@ namespace HunieBot.Host
         /// <summary>
         ///     Property bag of related metadata for dealing with <see cref="HandleEventAttribute"/>.
         /// </summary>
-        private sealed class HunieEventMetaData
+        internal sealed class HunieEventMetaData
         {
             public MethodInfo Method { get; }
             public MethodInjector MethodInjector { get; }
@@ -581,20 +603,22 @@ namespace HunieBot.Host
         /// <summary>
         ///     Property bag of related metadata for dealing with <see cref="HandleCommandAttribute"/>.
         /// </summary>
-        private sealed class HunieCommandMetaData
+        internal sealed class HunieCommandMetaData
         {
             public MethodInfo Method { get; }
             public MethodInjector MethodInjector { get; }
             public HandleCommandAttribute Attribute { get; }
+            public DescriptionAttribute Description { get; }
             public ParameterInfo[] Parameters { get; }
 
 
-            public HunieCommandMetaData(MethodInfo mi, MethodInjector mj, HandleCommandAttribute hca)
+            public HunieCommandMetaData(MethodInfo mi, MethodInjector mj, HandleCommandAttribute hca, DescriptionAttribute desc)
             {
                 Method = mi;
                 MethodInjector = mj;
                 Attribute = hca;
                 Parameters = Method.GetParameters();
+                Description = desc;
                 ValidateParameters();
             }
 

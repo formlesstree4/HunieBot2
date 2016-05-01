@@ -73,7 +73,12 @@ namespace HunieBot.Host.Enumerations
         /// <summary>
         ///     A private or public message has been received.
         /// </summary>
-        AnyMessageReceived = PrivateMessageReceived | MessageReceived
+        AnyMessageReceived = PrivateMessageReceived | MessageReceived,
+
+        /// <summary>
+        ///     The HunieHost has established a connection.
+        /// </summary>
+        Connected = 4096
 
     }
 

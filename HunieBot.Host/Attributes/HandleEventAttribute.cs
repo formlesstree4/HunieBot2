@@ -16,10 +16,10 @@ namespace HunieBot.Host.Attributes
         /// </summary>
         public CommandEvent Events { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="UserPermissions"/> that the user submitting the command must be at.s
-        /// </summary>
-        public UserPermissions Permissions { get; }
+        ///// <summary>
+        /////     Gets the <see cref="UserPermissions"/> that the user submitting the command must be at.s
+        ///// </summary>
+        //public UserPermissions Permissions { get; }
 
 
 
@@ -28,11 +28,10 @@ namespace HunieBot.Host.Attributes
         /// </summary>
         /// <param name="event"><see cref="CommandEvent"/></param>
         /// <param name="permissions"><see cref="UserPermissions"/></param>
-        public HandleEventAttribute(CommandEvent @event, UserPermissions permissions = UserPermissions.User)
+        public HandleEventAttribute(CommandEvent @event)
         {
             if((@event & CommandEvent.CommandReceived) != 0) throw new ArgumentException($"{nameof(HandleEventAttribute)} cannot handle {nameof(CommandEvent.CommandReceived)}. Please use {nameof(HandleCommandAttribute)} for handling commands.");
             Events = @event;
-            Permissions = permissions;
         }
 
     }

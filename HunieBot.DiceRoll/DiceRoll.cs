@@ -18,7 +18,7 @@ namespace HunieBot.DiceRoll
     {
         private readonly int MaxIterations = 10;
 
-        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.Owner, "roll")]
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, "roll")]
         public async Task HandleDiceRoll(IHunieCommand command, ILogging logger)
         {
             long sum = 0;
