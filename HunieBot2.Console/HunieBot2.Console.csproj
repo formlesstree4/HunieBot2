@@ -53,6 +53,10 @@
       <Project>{8d71a857-879a-4a10-859e-5ff824ed6688}</Project>
       <Name>Discord.Net</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HunieBot.BlackJack\HunieBot.BlackJack.csproj">
+      <Project>{bad371bf-9306-424b-be0e-ec7025bc57ad}</Project>
+      <Name>HunieBot.BlackJack</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HunieBot.DiceRoll\HunieBot.DiceRoll.csproj">
       <Project>{8513ddab-0879-4cf6-abfe-6209ab0925cf}</Project>
       <Name>HunieBot.DiceRoll</Name>

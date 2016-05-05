@@ -481,8 +481,7 @@ namespace HunieBot.Host
             private async Task HandleAsEvent(IHunieEvent hEvent, CommandEvent commandEvent)
             {
                 foreach (var methodData in (from c in _eventMetaData
-                                            where (c.Attribute.Events & commandEvent) == commandEvent // &&
-                                            // (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions)
+                                            where (c.Attribute.Events & commandEvent) == commandEvent
                                             select c))
                 {
                     await Task.Run(() =>
@@ -501,11 +500,29 @@ namespace HunieBot.Host
             private async Task HandleAsCommand(IHunieEvent hEvent, CommandEvent commandEvent)
             {
                 var cmd = hEvent as IHunieCommand;
-                foreach (var methodData in (from c in _commandMetaData
-                                            where (c.Attribute.Events & commandEvent) == commandEvent &&
-                                            (hEvent.User != null && (_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
-                                            c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase) &&
-                                            (hEvent.Channel.IsPrivate || _commandPermissions.GetCommandListenerStatus(c.Attribute.Commands, hEvent.Server.Id, hEvent.Channel.Id))
+
+                /*
+                    for each item in the command metadata collection, we are going
+                    to select out the ones that meet thhe following criteria:
+                    1) Make sure that we pull a command that actually handles the Command text that was submitted.
+                    1) The event must be a supported command event.
+                        Example: If the event is a PrivateMessage, the only commands
+                        that accept private messages are going to be pulled.
+                    3) Make sure that the User can execute this event.
+                    4) Make sure that the Channel this command was sent from can execute this command:
+                        A) If the channel is private, the command can always be executed (so long as the command is configured to receive private messages)
+                        B) If the command is opted in to using permission filtering, check the internal permissions class to ensure that this command may
+                        execute for the channel+server combination.
+                */
+                foreach (var methodData in (from c in _commandMetaData where
+                                            (c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase)) &&
+                                            (c.Attribute.Events & commandEvent) == commandEvent &&
+                                            ((_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
+                                            (
+                                                hEvent.Channel.IsPrivate |
+                                                !c.Attribute.IsPermissionsDriven |
+                                                _commandPermissions.GetCommandListenerStatus(c.Attribute.Commands, hEvent.Server.Id, hEvent.Channel.Id)
+                                            )
                                             select c))
                 {
                     await Task.Run(() =>

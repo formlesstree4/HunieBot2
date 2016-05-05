@@ -3,7 +3,6 @@ using HunieBot.Host.Enumerations;
 using HunieBot.Host.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +17,7 @@ namespace HunieBot.DiceRoll
     {
         private readonly int MaxIterations = 10;
 
-        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, "roll")]
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, true, "roll")]
         public async Task HandleDiceRoll(IHunieCommand command, ILogging logger)
         {
             long sum = 0;

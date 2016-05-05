@@ -27,6 +27,11 @@ namespace HunieBot.Host.Attributes
         /// </summary>
         public string[] Commands { get; }
 
+        /// <summary>
+        ///     Gets a boolean that indicates whether or not the usage of this command is restricted by <see cref="Interfaces.IHunieCommandPermissions"/>.
+        /// </summary>
+        public bool IsPermissionsDriven { get; }
+
 
 
         /// <summary>
@@ -35,12 +40,13 @@ namespace HunieBot.Host.Attributes
         /// <param name="@event"><see cref="CommandEvent"/>. This is restricted to a subset of entries inside <see cref="CommandEvent"/>. Please see the remarks below.</param>
         /// <param name="commands">A string array of acceptable commands. This list will be handled as case insensitive and must not include the <see cref="HunieConfiguration.CommandCharacter"/> prefix.</param>
         /// <param name="permissions">The <see cref="UserPermissions"/> level of who may invoke this command</param>
-        public HandleCommandAttribute(CommandEvent @event, UserPermissions permissions = UserPermissions.User, params string[] commands)
+        public HandleCommandAttribute(CommandEvent @event, UserPermissions permissions = UserPermissions.User, bool usesPermissions = false, params string[] commands)
         {
             ValidateParameters(@event, commands);
             Events = @event;
             Permissions = permissions;
             Commands = commands;
+            IsPermissionsDriven = usesPermissions;
         }
 
 
