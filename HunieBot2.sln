@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HunieBot2", "HunieBot2", "{D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}"
 EndProject
@@ -25,8 +25,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.Danbooru", "HunieB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.BlackJack", "HunieBot.BlackJack\HunieBot.BlackJack.csproj", "{BAD371BF-9306-424B-BE0E-EC7025BC57AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Audio", "..\..\Discord-dot-net\src\Discord.Net.Audio.Net45\Discord.Net.Audio.csproj", "{7BFEF748-B934-4621-9B11-6302E3A9F6B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.MusicStream", "HunieBot.MusicStream\HunieBot.MusicStream.csproj", "{49FC8405-B200-4D38-B248-8498D068476C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\Discord-dot-net\src\Discord.Net.Shared\Discord.Net.Shared.projitems*{7bfef748-b934-4621-9b11-6302e3a9f6b3}*SharedItemsImports = 4
 		..\..\Discord-dot-net\src\Discord.Net.Shared\Discord.Net.Shared.projitems*{8d71a857-879a-4a10-859e-5ff824ed6688}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +82,18 @@ Global
 		{BAD371BF-9306-424B-BE0E-EC7025BC57AD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BAD371BF-9306-424B-BE0E-EC7025BC57AD}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
 		{BAD371BF-9306-424B-BE0E-EC7025BC57AD}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{49FC8405-B200-4D38-B248-8498D068476C}.TestResponses|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,5 +108,7 @@ Global
 		{8513DDAB-0879-4CF6-ABFE-6209AB0925CF} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{8D3E8A05-EA07-4C4D-9704-5F6B637AB3E4} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{BAD371BF-9306-424B-BE0E-EC7025BC57AD} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
+		{7BFEF748-B934-4621-9B11-6302E3A9F6B3} = {E7D0B53B-C40F-4931-81AD-863CA53D778D}
+		{49FC8405-B200-4D38-B248-8498D068476C} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 	EndGlobalSection
 EndGlobal
