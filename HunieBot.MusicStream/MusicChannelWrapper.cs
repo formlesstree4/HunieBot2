@@ -12,6 +12,7 @@ namespace HunieBot.MusicStream
     /// </summary>
     public sealed class MusicChannelWrapper : IDisposable
     {
+        private bool _errorOccurred = false;
         private bool _isPlaying = false;
         private bool _canPlay = true;
         private bool _disposedValue = false; // To detect redundant calls
@@ -24,6 +25,11 @@ namespace HunieBot.MusicStream
         ///     Raised when <see cref="MusicChannelWrapper"/> has finished playing a song.
         /// </summary>
         public EventHandler Finished;
+
+        /// <summary>
+        ///     Raised when <see cref="MusicChannelWrapper"/> crashes and is unable to continue playing.
+        /// </summary>
+        public EventHandler Crashed;
 
 
 
@@ -66,9 +72,12 @@ namespace HunieBot.MusicStream
         /// <summary>
         ///     Plays a file from the file system.
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="file">The file to play</param>
+        /// <remarks>This operation will execute on a different thread than the calling thread. </remarks>
+        /// <exception cref="InvalidOperationException" />
         public void Play(string file)
         {
+            if (_errorOccurred) throw new InvalidOperationException();
             _canPlay = true;
             CurrentlyPlaying = Path.GetFileNameWithoutExtension(file);
             Task.Run(() =>
@@ -98,6 +107,8 @@ namespace HunieBot.MusicStream
                         catch (OperationCanceledException)
                         {
                             _canPlay = false;
+                            _errorOccurred = true;
+                            Crashed?.Invoke(this, EventArgs.Empty);
                         }
                     }
                     if(_canPlay) Finished?.Invoke(this, EventArgs.Empty);
@@ -123,7 +134,13 @@ namespace HunieBot.MusicStream
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-                    _voiceChannel.Channel.LeaveAudio();
+                    try
+                    {
+                        _voiceChannel.Channel.LeaveAudio();
+                    }
+                    catch
+                    {
+                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

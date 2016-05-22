@@ -1,4 +1,5 @@
 ﻿using HunieBot.Host.Enumerations;
+using System;
 
 namespace HunieBot.Host.Interfaces
 {
@@ -6,27 +7,16 @@ namespace HunieBot.Host.Interfaces
     /// <summary>
     ///     Defines individual HunieHost User permissions.
     /// </summary>
-    public interface IHunieUserPermissions
+    public interface IHunieUserPermissions : IDisposable
     {
 
         /// <summary>
         ///     Gets or sets the <see cref="UserPermissions"/> for a unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier for a given user.</param>
+        /// <param name="serverId">The unique Id of the server</param>
+        /// <param name="userId">The unique Id of the user</param>
         /// <returns><see cref="UserPermissions"/></returns>
-        UserPermissions this[ulong id] { get; set; }
-
-        /// <summary>
-        ///     Saves <see cref="IHunieUserPermissions"/> to disk.
-        /// </summary>
-        /// <param name="file">The file to save to</param>
-        void Save(string file);
-
-        /// <summary>
-        ///     Loads <see cref="IHunieUserPermissions"/> from disk.
-        /// </summary>
-        /// <param name="file">The file to load from</param>
-        void Load(string file);
+        UserPermissions this[ulong serverId, ulong userId] { get; set; }
 
     }
 

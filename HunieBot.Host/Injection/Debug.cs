@@ -18,8 +18,6 @@ namespace HunieBot.Host.Injection
         public override void Load()
         {
             Bind<ILogging>().ToMethod(c => new DebugLogger());
-            Bind<IHunieUserPermissions>().ToConstant(new HunieUserPermissions());
-            Bind<IHunieCommandPermissions>().ToConstant(new HunieCommandPermissions());
         }
     }
 }

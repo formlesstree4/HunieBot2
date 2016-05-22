@@ -1,5 +1,6 @@
 ﻿using Discord;
 using HunieBot.Host.Attributes;
+using HunieBot.Host.Database;
 using HunieBot.Host.Enumerations;
 using HunieBot.Host.Injection;
 using HunieBot.Host.Injection.Implementations.Permissions;
@@ -24,9 +25,11 @@ namespace HunieBot.Host
     public sealed class HunieHost : IDisposable
     {
         private readonly static string HunieBotDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HunieBot");
-        private readonly static string ConfigurationFile = Path.Combine(HunieBotDataFolder, "configuration.json");
-        private readonly static string UserPermissionsFile = Path.Combine(HunieBotDataFolder, "userpermissions.json");
-        private readonly static string CommandPermissionsFile = Path.Combine(HunieBotDataFolder, "commandpermissions.json");
+        private readonly static string DatabaseFile = Path.Combine(HunieBotDataFolder, "huniebot.sqlite");
+
+        // private readonly static string ConfigurationFile = Path.Combine(HunieBotDataFolder, "configuration.json");
+        // private readonly static string UserPermissionsFile = Path.Combine(HunieBotDataFolder, "userpermissions.json");
+        // private readonly static string CommandPermissionsFile = Path.Combine(HunieBotDataFolder, "commandpermissions.json");
 
 
         private readonly IHunieCommandPermissions _commandPermissions;
@@ -63,16 +66,20 @@ namespace HunieBot.Host
 #else
             _loadedModule = new Release();
 #endif
+
+            // Let's make sure our appdata directory exists!
+            if (!Directory.Exists(HunieBotDataFolder)) Directory.CreateDirectory(HunieBotDataFolder);
+
             _discordClientConnection = new DiscordClient(dc);
             _ninject = new StandardKernel(_loadedModule);
+            _ninject.Bind<HunieConnectionManager>().ToConstant(new HunieConnectionManager(DatabaseFile));
+            _ninject.Bind<IHunieCommandPermissions>().ToConstant(new HunieCommandPermissions(_ninject.Get<HunieConnectionManager>()));
+            _ninject.Bind<IHunieUserPermissions>().ToConstant(new HunieUserPermissions(_ninject.Get<HunieConnectionManager>()));
             _ninject.Bind<DiscordClient>().ToConstant(_discordClientConnection);
             _logger = _ninject.Get<ILogging>();
             _userPermissions = _ninject.Get<IHunieUserPermissions>();
             _commandPermissions = _ninject.Get<IHunieCommandPermissions>();
             _wrappers = new List<HunieWrapper>();
-            _userPermissions.Load(UserPermissionsFile);
-            _commandPermissions.Load(CommandPermissionsFile);
-            Configuration.Load(ConfigurationFile);
             RegisterEvents();
             LoadInternalBotInstances();
             SetAdditionalBindings();
@@ -88,7 +95,7 @@ namespace HunieBot.Host
         public async Task Start()
         {
             await _discordClientConnection.Connect(Configuration.DiscordToken);
-            _discordClientConnection.SetGame("I'm HunieBot! PM me \"!help\" for more details!");
+            _discordClientConnection.SetGame($"I'm HunieBot! PM me \"{Configuration.CommandCharacter}help\" for more details!");
         }
 
         /// <summary>
@@ -97,9 +104,6 @@ namespace HunieBot.Host
         /// <returns>A promise to stop <see cref="HunieHost"/></returns>
         public async Task Stop()
         {
-            _userPermissions.Save(UserPermissionsFile);
-            _commandPermissions.Save(CommandPermissionsFile);
-            Configuration.Save(ConfigurationFile);
             await _discordClientConnection.Disconnect();
         }
 
@@ -514,22 +518,43 @@ namespace HunieBot.Host
                         B) If the command is opted in to using permission filtering, check the internal permissions class to ensure that this command may
                         execute for the channel+server combination.
                 */
-                foreach (var methodData in (from c in _commandMetaData where
-                                            (c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase)) &&
-                                            (c.Attribute.Events & commandEvent) == commandEvent &&
-                                            ((_userPermissions[hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions) &&
-                                            (
-                                                hEvent.Channel.IsPrivate |
-                                                !c.Attribute.IsPermissionsDriven |
-                                                _commandPermissions.GetCommandListenerStatus(c.Attribute.Commands, hEvent.Server.Id, hEvent.Channel.Id)
-                                            )
-                                            select c))
+                foreach (var methodData in (from c in _commandMetaData
+                                            where
+                 DoesCommandExistInMetaData(cmd, c) &&
+                 DoesMetaDataSupportCommandEvent(commandEvent, c) &&
+                 DoesUserHavePermissionToExecuteCommand(hEvent, c) &&
+                 DoesCommandHavePermissionToExecute(hEvent, c) select c))
                 {
                     await Task.Run(() =>
                     {
                         methodData.MethodInjector(_instance, BuildParameterArray(methodData.Parameters, cmd, commandEvent));
                     });
                 }
+            }
+
+            private bool DoesCommandHavePermissionToExecute(IHunieEvent hEvent, HunieCommandMetaData c)
+            {
+                return
+                (
+                    hEvent.Channel.IsPrivate ||
+                    !c.Attribute.IsPermissionsDriven ||
+                    _commandPermissions[hEvent.Server.Id, hEvent.Channel.Id, c.Attribute.Commands]
+                );
+            }
+
+            private bool DoesUserHavePermissionToExecuteCommand(IHunieEvent hEvent, HunieCommandMetaData c)
+            {
+                return hEvent.Channel.IsPrivate || ((_userPermissions[hEvent.Server.Id, hEvent.User.Id] & c.Attribute.Permissions) == c.Attribute.Permissions);
+            }
+
+            private bool DoesMetaDataSupportCommandEvent(CommandEvent commandEvent, HunieCommandMetaData c)
+            {
+                return (c.Attribute.Events & commandEvent) == commandEvent;
+            }
+
+            private bool DoesCommandExistInMetaData(IHunieCommand cmd, HunieCommandMetaData c)
+            {
+                return (c.Attribute.Commands.Contains(cmd.Command, StringComparer.OrdinalIgnoreCase));
             }
 
             /// <summary>

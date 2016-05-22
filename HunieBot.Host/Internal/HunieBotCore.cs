@@ -27,37 +27,24 @@ namespace HunieBot.Host.Internal
             _commandPermissions = commandPermissions;
         }
 
-        [HandleEvent(CommandEvent.Connected)]
-        public async Task HandleOnConnect(IHunieEvent hEvent, DiscordClient client)
-        {
-            //// make sure all commands always work on all servers and channels
-            //foreach (var server in client.Servers)
-            //{
-            //    foreach (var channel in server.TextChannels)
-            //    {
-            //        _commandPermissions.SetCommandListenerStatus("ping", server.Id, channel.Id, true);
-            //        _commandPermissions.SetCommandListenerStatus("setperm", server.Id, channel.Id, true);
-            //        _commandPermissions.SetCommandListenerStatus("getperm", server.Id, channel.Id, true);
-            //        _commandPermissions.SetCommandListenerStatus("getmyperm", server.Id, channel.Id, true);
-            //        _commandPermissions.SetCommandListenerStatus("getmodules", server.Id, channel.Id, true);
-            //        _commandPermissions.SetCommandListenerStatus("getcommands", server.Id, channel.Id, true);
-            //    }
-            //}
-        }
-
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, commands: "ping"), Description("A simple ping command")]
         public async Task HandlePing(IHunieCommand command)
         {
             await command.Channel.SendMessage("pong");
         }
         
-        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.Administrator, commands: "set_user_permission")]
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.Administrator, commands: new[] { "set_user_permission", "sup" })]
         public async Task SetUserPermissions(IHunieCommand command)
         {
-            if (command.RawParameters.Length != 0 || command.RawParameters.Length != 2) return;
-            var userParameter = command.RawParameters[0].Trim();
-            var levelParameter = command.RawParameters[1].Trim();
-            await command.Channel.SendMessage($"Sorry {command.User.Mention}, {command.Command} is not implemented yet.");
+            if (command.RawParameters.Length != 2) return;
+            var userParameterRaw = command.RawParameters[0].Trim();
+            var levelParameterRaw = command.RawParameters[1].Trim();
+            UserPermissions userPermission;
+            var userId = Convert.ToUInt64(userParameterRaw.Substring(2, userParameterRaw.Length - 3));
+            var targetUser = command.Server.Users.First(u => u.Id == userId);
+            if (!Enum.TryParse(levelParameterRaw, true, out userPermission)) return;
+            _userPermissions[command.Server.Id, targetUser.Id] = userPermission;
+            await command.Channel.SendMessage($"{targetUser.Mention}'s new permission is {userPermission}");
         }
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.Administrator, commands: "get_user_permission")]
@@ -69,11 +56,11 @@ namespace HunieBot.Host.Internal
             await command.Channel.SendMessage($"Sorry {command.User.Mention}, {command.Command} is not implemented yet.");
         }
 
-        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived | CommandEvent.PrivateMessageReceived, UserPermissions.User, commands: "get_my_permission")]
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.User, commands: "get_my_permission")]
         public async Task GetMyPermission(IHunieCommand command)
         {
-            var userPerms = _userPermissions[command.User.Id];
-            await command.Channel.SendMessage($"{command.User.Mention} has a permission level of {userPerms}. This permission applies to me, {command.Client.CurrentUser.Mention}, not to {command.Channel.Mention}.");
+            var userPerms = _userPermissions[command.Server.Id, command.User.Id];
+            await command.Channel.SendMessage($"{command.User.Mention} has a permission level of {userPerms}.");
         }
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.User, commands: "get_modules")]
@@ -117,7 +104,7 @@ namespace HunieBot.Host.Internal
                     messageBuilder.AppendLine($"The command {rawCommandName} is non-existant. I cannot set a permission for a command that does not exist.");
                     continue;
                 }
-                _commandPermissions.SetCommandListenerStatus(rawCommandName.ToLowerInvariant(), command.Server.Id, command.Channel.Id, commandStatusBool);
+                _commandPermissions[command.Server.Id, command.Channel.Id, new[] { rawCommandName }] = commandStatusBool;
             }
             messageBuilder.AppendLine($"{rawCommandNames}'s status for {command.Channel.Mention} has been set to {commandStatusBool}.");
             await command.Channel.SendMessage(messageBuilder.ToString());
@@ -134,7 +121,7 @@ namespace HunieBot.Host.Internal
                 await command.Channel.SendMessage($"The command {rawCommandName} is non-existant. I cannot set a permission for a command that does not exist.");
                 return;
             }
-            await command.Channel.SendMessage($"{rawCommandName}'s status for {command.Channel.Mention} is {_commandPermissions.GetCommandListenerStatus(rawCommandName, command.Server.Id, command.Channel.Id)}.");
+            await command.Channel.SendMessage($"{rawCommandName}'s status for {command.Channel.Mention} is {_commandPermissions[command.Server.Id, command.Channel.Id, new[] { rawCommandName }]}.");
         }
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, false, "get_command_description", "gcd")]

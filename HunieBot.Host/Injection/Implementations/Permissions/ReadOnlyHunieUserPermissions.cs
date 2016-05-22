@@ -13,11 +13,11 @@ namespace HunieBot.Host.Injection.Implementations.Permissions
             _backingSource = _basePermissions;
         }
 
-        public UserPermissions this[ulong id]
+        public UserPermissions this[ulong serverId, ulong userId]
         {
             get
             {
-                return _backingSource[id];
+                return _backingSource[serverId, userId];
             }
 
             set
@@ -26,14 +26,9 @@ namespace HunieBot.Host.Injection.Implementations.Permissions
             }
         }
 
-        public void Load(string file)
+        public void Dispose()
         {
-            throw new NotSupportedException();
-        }
-
-        public void Save(string file)
-        {
-            throw new NotSupportedException();
+            _backingSource.Dispose();
         }
     }
 }
