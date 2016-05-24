@@ -41,7 +41,7 @@
     <Compile Include="SecureRandom.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Discord-dot-net\src\Discord.Net.Net45\Discord.Net.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Net45\Discord.Net.csproj">
       <Project>{8d71a857-879a-4a10-859e-5ff824ed6688}</Project>
       <Name>Discord.Net</Name>
     </ProjectReference>

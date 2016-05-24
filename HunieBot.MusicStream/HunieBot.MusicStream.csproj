@@ -54,11 +54,11 @@
     <Compile Include="SecureRandom.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Discord-dot-net\src\Discord.Net.Audio.Net45\Discord.Net.Audio.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Audio.Net45\Discord.Net.Audio.csproj">
       <Project>{7bfef748-b934-4621-9b11-6302e3a9f6b3}</Project>
       <Name>Discord.Net.Audio</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Discord-dot-net\src\Discord.Net.Net45\Discord.Net.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Net45\Discord.Net.csproj">
       <Project>{8d71a857-879a-4a10-859e-5ff824ed6688}</Project>
       <Name>Discord.Net</Name>
     </ProjectReference>
