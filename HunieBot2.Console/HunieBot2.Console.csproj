@@ -43,6 +43,10 @@
       <HintPath>..\packages\Microsoft.AspNet.WebHooks.Receivers.1.2.0-rc1b\lib\net45\Microsoft.AspNet.WebHooks.Receivers.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.WebHooks.Receivers.GitHub, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebHooks.Receivers.GitHub.1.2.0-rc1b\lib\net45\Microsoft.AspNet.WebHooks.Receivers.GitHub.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin, Version=2.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.2.0.2\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
@@ -91,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommitPayload.cs" />
-    <Compile Include="GitHubReceiverController.cs" />
+    <Compile Include="GitHubReceiver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushPayload.cs" />
