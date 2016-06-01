@@ -15,6 +15,9 @@ namespace HunieBot.WikipediaSearch
     public sealed class WikipediaSearch
     {
         private const string WikipediaApiScheme = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exlimit=max&explaintext&exintro&titles={0}&redirects=";
+        private const string CodeBlockStart = "```\r\n";
+        private const string CodeBlockEnd = "\r\n```";
+        private const string Ellipses = "...";
 
         [HandleCommand(CommandEvent.AnyMessageReceived | CommandEvent.CommandReceived, UserPermissions.User, commands: new[] { "wiki" })]
         public async Task HandleCommand(IHunieCommand command)
@@ -64,16 +67,14 @@ namespace HunieBot.WikipediaSearch
 
                         if (hasResults)
                         {
-                            builder.Insert(0, "```\r\n");
-                            if (builder.Length > DiscordConfig.MaxMessageSize)
+                            builder.Insert(0, CodeBlockStart);
+                            if (builder.Length > DiscordConfig.MaxMessageSize + CodeBlockEnd.Length)
                             {
-                                // Extra 5 characters for end of code block.
-                                // Extra 3 characters for elipses.
-                                var difference = builder.Length - DiscordConfig.MaxMessageSize + 5 + 3;
+                                var difference = builder.Length - DiscordConfig.MaxMessageSize + CodeBlockEnd.Length + Ellipses.Length;
                                 builder = builder.Remove(builder.Length - difference, difference);
-                                builder.Insert(builder.Length, "...");
+                                builder.Insert(builder.Length, Ellipses);
                             }
-                            builder.Insert(builder.Length, "\r\n```");
+                            builder.Insert(builder.Length, CodeBlockEnd);
                             await command.Channel.SendMessage(builder.ToString());
                         }
                     }
