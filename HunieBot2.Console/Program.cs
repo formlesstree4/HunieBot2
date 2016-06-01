@@ -7,7 +7,7 @@ namespace HunieBot2.Console
         {
             using (var b = new HunieBot.Host.HunieHost())
             {
-                // b.Configuration.DiscordToken = "<token here>";
+                b.Configuration.DiscordToken = "MTg0NDAwODMyMTQ0MzQzMDQw.CjC9Hw.QV86LTr0yDaJ7T3H-PLT20pVIdY";
                 b.Start().Wait();
                 System.Console.ReadLine();
                 b.Stop();

@@ -77,6 +77,10 @@
       <Project>{49fc8405-b200-4d38-b248-8498d068476c}</Project>
       <Name>HunieBot.MusicStream</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HunieBot.WikiSearch\HunieBot.WikipediaSearch.csproj">
+      <Project>{ab4bb41b-22bc-4711-ae75-b7ecc050c43d}</Project>
+      <Name>HunieBot.WikipediaSearch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.101.0\build\net45\System.Data.SQLite.Core.targets')" />
