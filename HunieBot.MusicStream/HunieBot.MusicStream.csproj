@@ -32,6 +32,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Discord.Net, Version=0.9.3.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.0.9.3.1\lib\net45\Discord.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Discord.Net.Audio, Version=0.9.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Audio.0.9.3\lib\net45\Discord.Net.Audio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -40,8 +48,28 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.Concurrent.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Enlightenment, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="YoutubeExtractor, Version=0.10.10.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\YoutubeExtractor.0.10.10\lib\net35\YoutubeExtractor.dll</HintPath>
       <Private>True</Private>
@@ -54,14 +82,6 @@
     <Compile Include="SecureRandom.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Discord-dot-net\src\Discord.Net.Audio.Net45\Discord.Net.Audio.csproj">
-      <Project>{7bfef748-b934-4621-9b11-6302e3a9f6b3}</Project>
-      <Name>Discord.Net.Audio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Discord-dot-net\src\Discord.Net.Net45\Discord.Net.csproj">
-      <Project>{8d71a857-879a-4a10-859e-5ff824ed6688}</Project>
-      <Name>Discord.Net</Name>
-    </ProjectReference>
     <ProjectReference Include="..\HunieBot.Host\HunieBot.Host.csproj">
       <Project>{8d7e0c36-e16a-442f-ad6b-6e8b2d922b34}</Project>
       <Name>HunieBot.Host</Name>
