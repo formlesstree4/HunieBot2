@@ -1,3 +1,8 @@
+# This project has been deprecated!
+Hey guys. The reason HunieBot2 was started was to make commands easier to implement using [Discord.NET](https://github.com/RogueException/Discord.Net). Well, that is no longer necessary. [Discord.NET](https://github.com/RogueException/Discord.Net) now uses a roughly similar command system that HunieBot2 implemented. I will leave this repository up for the time being, but, it is no longer being actively maintained and hasn't for some time.
+
+
+
 # HunieBot
 HunieBot is a small Discord Bot Framework built on top of [Discord.NET](https://github.com/RogueException/Discord.Net) that aims to make the initial startup cost of creating a Bot for Discord simple and easy by using Attributes to decorate classes, methods, and functions.
 
