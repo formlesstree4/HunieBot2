@@ -314,8 +314,8 @@ namespace HunieBot.BlackJack
                 currentPlayer = _players[_currentPlayerIndex];
             }
             if (currentPlayer.User.Id != e.User.Id) return;
-            if (e.Parameters.Length == 0) return;
-            var valueRaw = e.Parameters[0].Trim();
+            if (e.ParametersArray.Length == 0) return;
+            var valueRaw = e.ParametersArray[0].Trim();
             decimal value;
             if (!decimal.TryParse(valueRaw, out value))
             {

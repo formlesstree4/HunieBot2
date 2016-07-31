@@ -17,12 +17,12 @@ namespace HunieBot.DiceRoll
     {
         private readonly int MaxIterations = 10;
 
-        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, true, "roll")]
+        [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, false, "roll")]
         public async Task HandleDiceRoll(IHunieCommand command, ILogging logger)
         {
             long sum = 0;
             var diceMessageBuilder = new StringBuilder();
-            var commandString = string.Join(" ", command.Parameters);
+            var commandString = string.Join(" ", command.ParametersArray);
             var arrayOfRolls = commandString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             logger.Trace($"Full roll expression: {string.Join(" ", arrayOfRolls)}");
             foreach (var currentRoll in arrayOfRolls)

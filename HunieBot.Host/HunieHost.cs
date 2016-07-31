@@ -578,7 +578,8 @@ namespace HunieBot.Host
                 var parameterArray = new object[parameters.Length];
                 for (int pCount = 0; pCount < parameterArray.Length; pCount++)
                 {
-                    var pType = parameters[pCount].ParameterType;
+                    var p = parameters[pCount];
+                    var pType = p.ParameterType;
                     if(pType == typeof(CommandEvent))
                     {
                         parameterArray[pCount] = commandEvent;
@@ -700,6 +701,14 @@ namespace HunieBot.Host
         public static IHunieEvent ToHunieEvent(this ChannelUpdatedEventArgs args, DiscordClient c)
         {
             return new HunieEvent(args.After, args.Server, null, c);
+        }
+        public static IEnumerable<string> ParseParameters(this string p)
+        {
+            return p.Split('"')
+                .Select((element, index) => index % 2 == 0
+                    ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                    : new[] { element })
+                .SelectMany(element => element).ToList();
         }
     }
 

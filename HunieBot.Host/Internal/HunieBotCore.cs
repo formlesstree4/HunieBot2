@@ -36,9 +36,9 @@ namespace HunieBot.Host.Internal
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.Administrator, commands: new[] { "set_user_permission", "sup" })]
         public async Task SetUserPermissions(IHunieCommand command)
         {
-            if (command.RawParameters.Length != 2) return;
-            var userParameterRaw = command.RawParameters[0].Trim();
-            var levelParameterRaw = command.RawParameters[1].Trim();
+            if (command.RawParametersArray.Length != 2) return;
+            var userParameterRaw = command.RawParametersArray[0].Trim();
+            var levelParameterRaw = command.RawParametersArray[1].Trim();
             UserPermissions userPermission;
             var userId = Convert.ToUInt64(userParameterRaw.Substring(2, userParameterRaw.Length - 3));
             var targetUser = command.Server.Users.First(u => u.Id == userId);
@@ -50,9 +50,9 @@ namespace HunieBot.Host.Internal
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.MessageReceived, UserPermissions.Administrator, commands: "get_user_permission")]
         public async Task GetUserPermission(IHunieCommand command)
         {
-            if (command.RawParameters.Length != 0 || command.RawParameters.Length != 2) return;
-            var userParameter = command.RawParameters[0].Trim();
-            var levelParameter = command.RawParameters[1].Trim();
+            if (command.RawParametersArray.Length != 0 || command.RawParametersArray.Length != 2) return;
+            var userParameter = command.RawParametersArray[0].Trim();
+            var levelParameter = command.RawParametersArray[1].Trim();
             await command.Channel.SendMessage($"Sorry {command.User.Mention}, {command.Command} is not implemented yet.");
         }
 
@@ -81,8 +81,8 @@ namespace HunieBot.Host.Internal
             var messageBuilder = new StringBuilder();
             var loadedCommands = new System.Collections.Generic.List<string>();
             foreach (var item in hhmd.Commands) loadedCommands.AddRange(item.Commands);
-            var rawCommandNames = command.Parameters[0];
-            var rawCommandStatus = command.Parameters[1];
+            var rawCommandNames = command.ParametersArray[0];
+            var rawCommandStatus = command.ParametersArray[1];
             int commandStatusInt;
             bool commandStatusBool;
 
@@ -115,7 +115,7 @@ namespace HunieBot.Host.Internal
         {
             var loadedCommands = new System.Collections.Generic.List<string>();
             foreach (var item in hhmd.Commands) loadedCommands.AddRange(item.Commands);
-            var rawCommandName = command.Parameters[0];
+            var rawCommandName = command.ParametersArray[0];
             if (!loadedCommands.Contains(rawCommandName, StringComparer.OrdinalIgnoreCase))
             {
                 await command.Channel.SendMessage($"The command {rawCommandName} is non-existant. I cannot set a permission for a command that does not exist.");
@@ -127,7 +127,7 @@ namespace HunieBot.Host.Internal
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, false, "get_command_description", "gcd")]
         public async Task HandleGetCommandDescription(IHunieCommand command, IHunieHostMetaData hhmd)
         {
-            var cmd = command.Parameters[0];
+            var cmd = command.ParametersArray[0];
             foreach (var wrapper in hhmd.Commands)
                 foreach (var item in wrapper.CommandMetadata)
                     if(item.Attribute.Commands.Contains(cmd, StringComparer.OrdinalIgnoreCase))

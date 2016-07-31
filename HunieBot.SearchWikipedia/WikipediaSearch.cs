@@ -22,13 +22,13 @@ namespace HunieBot.WikipediaSearch
         [HandleCommand(CommandEvent.AnyMessageReceived | CommandEvent.CommandReceived, UserPermissions.User, commands: new[] { "wiki" })]
         public async Task HandleCommand(IHunieCommand command)
         {
-            if (!command.Parameters.Any())
+            if (!command.ParametersArray.Any())
             {
                 await command.Channel.SendMessage("Perform a wiki search by typing `.wiki baseball`");
             }
             else
             {
-                string query = string.Join(" ", command.Parameters);
+                string query = string.Join(" ", command.ParametersArray);
                 query = WebUtility.UrlEncode(query);
                 var request = WebRequest.Create(string.Format(WikipediaApiScheme, query));
                 var response = await request.GetResponseAsync();

@@ -83,10 +83,10 @@ namespace HunieBot.MusicStream
         public async Task PlayYouTubeVideo(IHunieCommand command)
         {
             // the first parameter should be the yt video to download.
-            if (command.Parameters.Length == 0) return;
+            if (command.ParametersArray.Length == 0) return;
             string link;
 
-            if (!DownloadUrlResolver.TryNormalizeYoutubeUrl(command.Parameters[0], out link)) return;
+            if (!DownloadUrlResolver.TryNormalizeYoutubeUrl(command.ParametersArray[0], out link)) return;
             var videoInfo = DownloadUrlResolver.GetDownloadUrls(link);
             var bestAudio = videoInfo
                 .Where(info => info.CanExtractAudio)
