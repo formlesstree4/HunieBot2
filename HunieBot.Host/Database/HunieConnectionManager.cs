@@ -45,7 +45,7 @@ namespace HunieBot.Host.Database
                 hbConn.Execute("CREATE TABLE HunieConfiguration (HunieBotName VARCHAR NOT NULL, Name VARCHAR NOT NULL, Value VARCHAR NOT NULL, PRIMARY KEY (HunieBotName))");
 
                 // Now throw on the indexes.
-                hbConn.Execute("CREATE UNIQUE INDEX IX_ChannelPermissions_Query ON ChannelPermissions (ServerId, ChannelId)");
+                hbConn.Execute("CREATE UNIQUE INDEX IX_ChannelPermissions_Query ON ChannelPermissions (ServerId, ChannelId, Command)");
                 hbConn.Execute("CREATE UNIQUE INDEX IX_UserPermissions_Query ON UserPermissions (ServerId, UserId)");
                 hbConn.Execute("CREATE UNIQUE INDEX IX_HunieConfiguration_Query ON HunieConfiguration (HunieBotName, Name)");
             }
