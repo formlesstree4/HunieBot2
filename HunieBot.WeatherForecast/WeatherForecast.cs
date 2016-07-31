@@ -23,7 +23,7 @@ namespace HunieBot.WeatherForecast
             try
             {
                 var webClient = new WebClient();
-                var requestUrl = string.Format(ApiUrl, string.Join(" ", command.Parameters));
+                var requestUrl = string.Format(ApiUrl, string.Join(" ", command.ParametersArray));
                 var request = webClient.DownloadString(requestUrl);
                 //logger.Trace($"Got weather info: \n{request}");
                 var deserializedRequest = JsonConvert.DeserializeObject<OpenWeatherMapResponse>(request);
