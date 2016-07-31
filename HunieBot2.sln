@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.25302.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HunieBot2", "HunieBot2", "{D2CB0187-EFE3-4A5C-B4C6-A2F16DCDF7CA}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.MusicStream", "HunieBot.MusicStream\HunieBot.MusicStream.csproj", "{49FC8405-B200-4D38-B248-8498D068476C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.WikipediaSearch", "HunieBot.SearchWikipedia\HunieBot.WikipediaSearch.csproj", "{90243FE4-D26C-49A2-9F26-84D410AA0406}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.WeatherForecast", "HunieBot.WeatherForecast\HunieBot.WeatherForecast.csproj", "{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,12 @@ Global
 		{90243FE4-D26C-49A2-9F26-84D410AA0406}.Release|Any CPU.Build.0 = Release|Any CPU
 		{90243FE4-D26C-49A2-9F26-84D410AA0406}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
 		{90243FE4-D26C-49A2-9F26-84D410AA0406}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.TestResponses|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,5 +103,6 @@ Global
 		{BAD371BF-9306-424B-BE0E-EC7025BC57AD} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{49FC8405-B200-4D38-B248-8498D068476C} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{90243FE4-D26C-49A2-9F26-84D410AA0406} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
+		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 	EndGlobalSection
 EndGlobal
