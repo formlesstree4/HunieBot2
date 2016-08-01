@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.WikipediaSearch", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.WeatherForecast", "HunieBot.WeatherForecast\HunieBot.WeatherForecast.csproj", "{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HunieBot.RandomCatImage", "HunieBot.RandomCatImage\HunieBot.RandomCatImage.csproj", "{9C0C3337-8F06-423B-8C37-D1BC437509BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,12 @@ Global
 		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
 		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301}.TestResponses|Any CPU.Build.0 = Release|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.TestResponses|Any CPU.ActiveCfg = Release|Any CPU
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF}.TestResponses|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,5 +112,6 @@ Global
 		{49FC8405-B200-4D38-B248-8498D068476C} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{90243FE4-D26C-49A2-9F26-84D410AA0406} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 		{C0D56DCD-88DC-47BF-AF7C-28B5AB16A301} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
+		{9C0C3337-8F06-423B-8C37-D1BC437509BF} = {AB3507BF-1E81-40A2-B58E-70E9A4B9E578}
 	EndGlobalSection
 EndGlobal
