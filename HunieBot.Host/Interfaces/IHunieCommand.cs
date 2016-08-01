@@ -18,7 +18,7 @@
         /// <remarks>
         ///     Parsed from <see cref="Discord.Message.Text"/>
         /// </remarks>
-        string[] Parameters { get; }
+        string[] ParametersArray { get; }
 
         /// <summary>
         ///     Gets the parameters of the command that were passed in.
@@ -26,7 +26,7 @@
         /// <remarks>
         ///     Parsed from <see cref="Discord.Message.RawText"/>
         /// </remarks>
-        string[] RawParameters { get; }
+        string[] RawParametersArray { get; }
 
     }
 }
