@@ -5,12 +5,13 @@ namespace HunieBot2.Console
     {
         static void Main(string[] args)
         {
-            using (var b = new HunieBot.Host.HunieHost())
+            using (var honieHost = new HunieBot.Host.HunieHost())
             {
-                b.Configuration.DiscordToken = "oops";
-                b.Start().Wait();
+                honieHost.Configuration.DiscordToken = "MjExNjkzNjkyNjQ4NTU0NDk3.CohCqQ.3e_F8DkpTqtHenCpHEhuaCM_TNA";
+                honieHost.Configuration.Game = "I can finally have my own game!";
+                honieHost.Start().Wait();
                 System.Console.ReadLine();
-                b.Stop();
+                honieHost.Stop();
             }
         }
     }

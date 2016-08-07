@@ -21,12 +21,22 @@ namespace HunieBot.Host
         /// </summary>
         public string DiscordToken { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the game that the bot is in on startup.
+        /// </summary>
+        public string Game { get; set; }
 
+
+        public HunieConfiguration()
+        {
+            Game = $"I'm HunieBot! PM me \"{CommandCharacter}help\" for more details!";
+        }
 
         public void Save(string file)
         {
             File.WriteAllText(file, JsonConvert.SerializeObject(this));
         }
+
         public void Load(string file)
         {
             if (!File.Exists(file)) Save(file);
