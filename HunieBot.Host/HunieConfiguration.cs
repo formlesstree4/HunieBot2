@@ -39,10 +39,18 @@ namespace HunieBot.Host
 
         public void Load(string file)
         {
-            if (!File.Exists(file)) Save(file);
-            var hc = JsonConvert.DeserializeObject<HunieConfiguration>(File.ReadAllText(file));
+            if (!File.Exists(file))
+                Save(file);
+
+            var configFile = File.ReadAllText(file);
+
+            if (configFile == string.Empty)
+                return;
+
+            var hc = JsonConvert.DeserializeObject<HunieConfiguration>(configFile);
             CommandCharacter = hc.CommandCharacter;
             DiscordToken = hc.DiscordToken;
+            Game = hc.Game;
         }
 
     }
