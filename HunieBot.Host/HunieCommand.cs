@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using HunieBot.Host.Internal;
+using Fclp.Internals;
+using Fclp.Internals.Parsing;
 
 namespace HunieBot.Host
 {
@@ -15,6 +17,9 @@ namespace HunieBot.Host
     /// </summary>
     public sealed class HunieCommand : IHunieCommand
     {
+        private const char ParamsIndicator = '-';
+
+
         public Channel Channel { get; }
 
         public Message Message { get; }
@@ -47,17 +52,49 @@ namespace HunieBot.Host
             // 3) Each item after the first are the parameters.
             var cleanedRegText = m.Text.Trim().Substring(1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(f => f.Trim());
             var cleanedRawText = m.RawText.Trim().Substring(1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(f => f.Trim());
-            var processor = new FluentCommandLineParser();
+            var clnParams = m.Text.Substring(m.Text.IndexOf(' ') + 1);
+            var rawParams = m.RawText.Substring(m.RawText.IndexOf(' ') + 1);
+            var clnParamsParsed = clnParams.ParseParameters();
+            var rawParamsParsed = rawParams.ParseParameters();
 
             Command = cleanedRegText.First();
-            ParametersArray = cleanedRegText.Skip(1).ToArray();
-            RawParametersArray = cleanedRawText.Skip(1).ToArray();
-            var processed = processor.Parse(string.Join(" ", RawParametersArray).ParseParameters().ToArray());
-            Parameters = new Parameters(processed.AdditionalOptionsFound.ToDictionary(k => k.Key, k => k.Value));
+            ParametersArray = clnParams.ParseParameters().ToArray();
+            RawParametersArray = rawParams.ParseParameters().ToArray();
+            Parameters = new Parameters(ConvertArrayToParameters(rawParamsParsed.ToArray()));
 
         }
 
         public HunieCommand(IHunieMessage message) : this(message.Channel, message.Server, message.User, message.Client, message.Message) { }
+
+
+        private Dictionary<string, string> ConvertArrayToParameters(string[] array)
+        {
+            // we're going to use a naive implementation.
+            // if idx % 2 == 0, key
+            // if idx % 2 != 0, value
+            var dict = new Dictionary<string, string>();
+            var currentParameter = "";
+            var currentParameterValues = new List<string>();
+            foreach (var item in array)
+            {
+                if(item[0] == ParamsIndicator)
+                {
+                    if (!string.IsNullOrWhiteSpace(currentParameter))
+                    {
+                        dict[currentParameter] = string.Join(" ", currentParameterValues);
+                        currentParameterValues.Clear();
+                    }
+                    currentParameter = item.Substring(1);
+                    continue;
+                }
+                else
+                {
+                    currentParameterValues.Add(item);
+                }
+            }
+            dict[currentParameter] = string.Join(" ", currentParameterValues);
+            return dict;
+        }
 
     }
 
@@ -75,7 +112,19 @@ namespace HunieBot.Host
         {
             get
             {
-                return _parameters[key];
+                return _parameters.ContainsKey(key) ? _parameters[key] : "";
+            }
+        }
+
+        public string this[params string[] keys]
+        {
+            get
+            {
+                foreach (var key in keys)
+                {
+                    if (_parameters.ContainsKey(key)) return _parameters[key];
+                }
+                return "";
             }
         }
 
@@ -130,5 +179,5 @@ namespace HunieBot.Host
             return _parameters.GetEnumerator();
         }
     }
-
+    
 }

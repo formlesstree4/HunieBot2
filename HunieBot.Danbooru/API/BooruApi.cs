@@ -17,7 +17,22 @@ namespace HunieBot.Danbooru.API
         private bool _disposedValue = false; // To detect redundant calls
 
 
+        /// <summary>
+        ///     Creates a new instance of the <see cref="BooruApi"/> for anonymous access to danbooru.
+        /// </summary>
+        public BooruApi()
+        {
+            _client = new HttpClient();
+        }
 
+        /// <summary>
+        ///     Creates a new instance of the <see cref="BooruApi"/> for authenticated access to danbooru.
+        /// </summary>
+        /// <param name="name">Your username.</param>
+        /// <param name="key">Your API key</param>
+        /// <remarks>
+        ///     Danbooru appears to use rather basic authentication.
+        /// </remarks>
         public BooruApi(string name, string key)
         {
             _username = name;
@@ -28,14 +43,16 @@ namespace HunieBot.Danbooru.API
         }
 
 
-        public async Task<PostsResponse> Search(int limit, params string[] tags)
+        public async Task<Post[]> Search(int limit, int page, params string[] tags)
         {
-            var formattedUrl = $"https://danbooru.donmai.us/posts.json?limit={limit}&page=1&tags={string.Join("%20", tags)}";
+            var urlEncodedTags = RestSharp.Extensions.MonoHttp.HttpUtility.UrlEncode(string.Join(" ", tags));
+
+            var formattedUrl = $"https://danbooru.donmai.us/posts.json?limit={limit}&page={page}&tags={urlEncodedTags}";
             var respObj = await _client.GetAsync(formattedUrl);
             var strResponse = await respObj.Content.ReadAsStringAsync();
-            return await Task.Run(() => JsonConvert.DeserializeObject<PostsResponse>(strResponse));
+            var responses = JsonConvert.DeserializeObject<Post[]>(strResponse);
+            return responses;
         }
-
 
         #region IDisposable Support
 
@@ -73,21 +90,30 @@ namespace HunieBot.Danbooru.API
 
     }
 
-
-
-    public class PostsResponse
+    public sealed class Post
     {
-        public List<Post> Responses { get; set; }
-    }
 
-    public class Post
-    {
-        public int id { get; set; }
-        public DateTime created_at { get; set; }
+        /// <summary>
+        ///     Gets or sets the unique Post ID on Danbooru.
+        /// </summary>
+        [JsonProperty("id")]
+        public int ID { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the UTC <see cref="DateTime"/> this <see cref="Post"/> was created
+        /// </summary>
+        [JsonProperty("created_at")]
+        public DateTime Created { get; set; }
+
         public int uploader_id { get; set; }
+
+
         public int score { get; set; }
+
         public string source { get; set; }
-        public string md5 { get; set; }
+
+        //public string md5 { get; set; }
+
         public DateTime? last_comment_bumped_at { get; set; }
         public string rating { get; set; }
         public int image_width { get; set; }
@@ -131,6 +157,10 @@ namespace HunieBot.Danbooru.API
         public string file_url { get; set; }
         public string large_file_url { get; set; }
         public string preview_file_url { get; set; }
+
+        public string GetPostUrl => $"http://danbooru.donmai.us/posts/{ID}";
+        public string GetDownloadUrl => $"https://danbooru.donmai.us{file_url ?? large_file_url}";
+
     }
 
 

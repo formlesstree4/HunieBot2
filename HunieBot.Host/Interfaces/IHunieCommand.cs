@@ -1,4 +1,6 @@
-﻿namespace HunieBot.Host.Interfaces
+﻿using Discord;
+
+namespace HunieBot.Host.Interfaces
 {
 
     /// <summary>
@@ -27,6 +29,11 @@
         ///     Parsed from <see cref="Discord.Message.RawText"/>
         /// </remarks>
         string[] RawParametersArray { get; }
+
+        /// <summary>
+        ///     Gets a specially parsed <see cref="HunieBot.Host.Parameters"/> object.
+        /// </summary>
+        Parameters Parameters { get; }
 
     }
 }
