@@ -14,7 +14,7 @@ namespace HunieBot.WeatherForecast
     public class WeatherForecast
     {
 
-        //private const string ApiKey = "[insert api key]";
+        private const string ApiKey = "[insert api key]";
         private string ApiUrl = $"http://api.openweathermap.org/data/2.5/weather?APPID={ApiKey}&q={{0}}";
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, true, commands: new[] { "w", "weather" })]

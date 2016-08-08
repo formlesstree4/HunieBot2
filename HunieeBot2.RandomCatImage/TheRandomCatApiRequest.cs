@@ -98,151 +98,271 @@ namespace RandomCatImage
         }
     }
 
-    ///// <summary>
-    ///// This lets you or one of your users score an image 1-10
-    ///// </summary>
-    ///// <example>
-    ///// This is an example of User 12345 giving Image bC24 a score of 10
-    ///// <code>
-    ///// http://thecatapi.com/api/images/vote?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24&score=10
-    ///// </code>
-    ///// </example>
-    //public class Vote : IApiGetRequest
-    //{
-    //    public string api_key { get; set; }
+    /// <summary>
+    /// This lets you or one of your users score an image 1-10
+    /// </summary>
+    /// <example>
+    /// This is an example of User 12345 giving Image bC24 a score of 10
+    /// <code>
+    /// http://thecatapi.com/api/images/vote?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24&score=10
+    /// </code>
+    /// </example>
+    public class Vote : IApiGetRequest
+    {
+        public string api_key { get; set; }
 
-    //    /// <summary>
-    //    /// Unique id of the image to vote on.
-    //    /// </summary>
-    //    public string image_id { get; set; }
+        /// <summary>
+        /// Unique id of the image to vote on.
+        /// </summary>
+        public string image_id { get; set; }
 
-    //    /// <summary>
-    //    /// The score you want to give to the image 1 = bad / 10 = good.
-    //    /// </summary>
-    //    public int score { get; set; }
+        /// <summary>
+        /// The score you want to give to the image 1 = bad / 10 = good.
+        /// </summary>
+        public int score { get; set; }
 
-    //    /// <summary>
-    //    /// Any value you wish to associate with this vote, could be a unique id you have for one of your Users like a facebook id. This allows you to only have one vote on an Image per User.
-    //    /// </summary>
-    //    public string sub_id { get; set; }
-    //}
+        /// <summary>
+        /// Any value you wish to associate with this vote, could be a unique id you have for one of your Users like a facebook id. This allows you to only have one vote on an Image per User.
+        /// </summary>
+        public string sub_id { get; set; }
 
-    ///// <summary>
-    ///// This gets all the votes cast with your api_key
-    ///// </summary>
-    ///// <example>
-    ///// This is an example will return all the votes cast by user 12345
-    ///// <code>
-    ///// http://thecatapi.com/api/images/getvotes?api_key=[YOUR-API-KEY]&sub_id=12345
-    ///// </code>
-    ///// </example>
-    //public class GetVotes : IApiGetRequest
-    //{
-    //    public string api_key { get; set; }
+        public string RequestUrl
+        {
+            get
+            {
+                var sb = new StringBuilder("http://thecatapi.com/api/images/vote?");
 
-    //    /// <summary>
-    //    /// If this is passed, then only votes cast with this sub_id will be returned. Useful to find out which votes have been cast by which of your Users.
-    //    /// </summary>
-    //    public string sub_id { get; set; }
-    //}
+                // this is pretty much an all or nothing request. 
+                // we're just going to assume all of these properties are set
+                var paramList = new List<string>
+                {
+                    $"api_key={api_key}",
+                    $"image_id={image_id}",
+                    $"score={score}",
+                    $"sub_id={sub_id}"
+                };
 
-    ///// <summary>
-    ///// This lets you or one of your Users favourite an Image
-    ///// </summary>
-    ///// <example>
-    ///// This is an example of User 12345 favouriting Image bC24
-    ///// <code>
-    ///// http://thecatapi.com/api/images/favourite?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24
-    ///// </code>
-    ///// This is an example of User 12345 un-favouriting Image bC24
-    ///// <code>
-    ///// http://thecatapi.com/api/images/favourite?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24&action=remove
-    ///// </code>
-    ///// </example>
-    //public class Favourite : IApiGetRequest
-    //{
-    //    public string api_key { get; set; }
+                if (!paramList.Any()) return sb.ToString();
+                sb.Append(string.Join("&", paramList));
 
-    //    /// <summary>
-    //    /// Unique id of the image to favourite or un-favourite
-    //    /// </summary>
-    //    public string image_id { get; set; }
+                return sb.ToString();
+            }
+        }
+    }
 
-    //    /// <summary>
-    //    /// This allows you to say whether to add a favourite or remove it
-    //    /// </summary>
-    //    public string action { get; set; }
-    //}
+    /// <summary>
+    /// This gets all the votes cast with your api_key
+    /// </summary>
+    /// <example>
+    /// This is an example will return all the votes cast by user 12345
+    /// <code>
+    /// http://thecatapi.com/api/images/getvotes?api_key=[YOUR-API-KEY]&sub_id=12345
+    /// </code>
+    /// </example>
+    public class GetVotes : IApiGetRequest
+    {
+        public string api_key { get; set; }
 
-    ///// <summary>
-    ///// This gets all the favourites set with your api_key
-    ///// </summary>
-    ///// <example>
-    ///// This is an example will return all the Favourites for User 12345
-    ///// <code>
-    ///// http://thecatapi.com/api/images/getfavourites?api_key=[YOUR-API-KEY]&sub_id=12345
-    ///// </code>
-    ///// </example>
-    //public class GetFavourites : IApiGetRequest
-    //{
-    //    public string api_key { get; set; }
+        /// <summary>
+        /// If this is passed, then only votes cast with this sub_id will be returned. Useful to find out which votes have been cast by which of your Users.
+        /// </summary>
+        public string sub_id { get; set; }
 
-    //    public string sub_id { get; set; }
-    //}
+        public string RequestUrl
+        {
+            get
+            {
+                var sb = new StringBuilder("http://thecatapi.com/api/images/getvotes?");
 
-    ///// <summary>
-    ///// This allows you to report an Image so it will not show up again when you make a get request with your api_key.
-    ///// </summary>
-    ///// <example>
-    ///// This will report Image 8 so it won't show up again for requests with your api_key.
-    ///// <code>
-    ///// http://thecatapi.com/api/images/report?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=8
-    ///// </code>
-    ///// </example>
-    //public class Report : IApiGetRequest
-    //{
-    //    public string api_key { get; set; }
+                // this is pretty much an all or nothing request. 
+                // we're just going to assume all of these properties are set
+                var paramList = new List<string>
+                {
+                    $"api_key={api_key}",
+                    $"sub_id={sub_id}"
+                };
 
-    //    /// <summary>
-    //    /// Unique id of the image to report
-    //    /// </summary>
-    //    public string image_id { get; set; }
+                if (!paramList.Any()) return sb.ToString();
+                sb.Append(string.Join("&", paramList));
 
-    //    /// <summary>
-    //    /// Any value you wish to associate with this, could be a unique id you have for one of your Users like a facebook id. This allows you to favourite this Image once per User.
-    //    /// </summary>
-    //    public string sub_id { get; set; }
+                return sb.ToString();
+            }
+        }
+    }
 
-    //    /// <summary>
-    //    /// Any particular reason why it needs reporting, contains nothing but hippos, doesn't work etc
-    //    /// </summary>
-    //    public string reason { get; set; }
-    //}
+    /// <summary>
+    /// This lets you or one of your Users favourite an Image
+    /// </summary>
+    /// <example>
+    /// This is an example of User 12345 favouriting Image bC24
+    /// <code>
+    /// http://thecatapi.com/api/images/favourite?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24
+    /// </code>
+    /// This is an example of User 12345 un-favouriting Image bC24
+    /// <code>
+    /// http://thecatapi.com/api/images/favourite?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=bC24&action=remove
+    /// </code>
+    /// </example>
+    public class Favourite : IApiGetRequest
+    {
+        public string api_key { get; set; }
 
-    ///// <summary>
-    ///// Returns a list of all the active categories.
-    ///// </summary>
-    ///// <example>
-    ///// <code>
-    ///// http://thecatapi.com/api/categories/list
-    ///// </code>
-    ///// </example>
-    //public class GetList : IApiGetRequest
-    //{
+        /// <summary>
+        /// Unique id of the image to favourite or un-favourite
+        /// </summary>
+        public string image_id { get; set; }
 
-    //}
+        /// <summary>
+        /// This allows you to say whether to add a favourite or remove it
+        /// </summary>
+        public string action { get; set; }
 
-    ///// <summary>
-    ///// This returns the total get requests/ votes/ favourites/ and images served for your account.
-    ///// </summary>
-    ///// <example>
-    ///// This will return the overview of the stats for your account.
-    ///// <code>
-    ///// http://thecatapi.com/api/stats/getoverview?api_key=[YOUR-API-KEY]
-    ///// </code>
-    ///// </example>
-    //public class GetOverview : IApiGetRequest
-    //{
+        /// <summary>
+        /// Any value you wish to associate with this, 
+        /// could be a unique id you have for one of your Users like a facebook id. 
+        /// This allows you to favourite this Image once per User.
+        /// </summary>
+        public string sub_id { get; set; }
 
-    //}
+        public string RequestUrl
+        {
+            get
+            {
+                var sb = new StringBuilder("http://thecatapi.com/api/images/favourite?");
+
+                // this is pretty much an all or nothing request. 
+                // we're just going to assume all of these properties are set
+                var paramList = new List<string>
+                {
+                    $"api_key={api_key}",
+                    $"image_id={image_id}",
+                    $"sub_id={sub_id}",
+                    $"action={action}"
+                };
+
+                if (!paramList.Any()) return sb.ToString();
+                sb.Append(string.Join("&", paramList));
+
+                return sb.ToString();
+            }
+        }
+    }
+
+    /// <summary>
+    /// This gets all the favourites set with your api_key
+    /// </summary>
+    /// <example>
+    /// This is an example will return all the Favourites for User 12345
+    /// <code>
+    /// http://thecatapi.com/api/images/getfavourites?api_key=[YOUR-API-KEY]&sub_id=12345
+    /// </code>
+    /// </example>
+    public class GetFavourites : IApiGetRequest
+    {
+        public string api_key { get; set; }
+
+        public string sub_id { get; set; }
+
+        public string RequestUrl
+        {
+            get
+            {
+                var sb = new StringBuilder("http://thecatapi.com/api/images/getfavourites?");
+
+                // this is pretty much an all or nothing request. 
+                // we're just going to assume all of these properties are set
+                var paramList = new List<string>
+                {
+                    $"api_key={api_key}",
+                    $"action={sub_id}"
+                };
+
+                if (!paramList.Any()) return sb.ToString();
+                sb.Append(string.Join("&", paramList));
+
+                return sb.ToString();
+            }
+        }
+    }
+
+    /// <summary>
+    /// This allows you to report an Image so it will not show up again when you make a get request with your api_key.
+    /// </summary>
+    /// <example>
+    /// This will report Image 8 so it won't show up again for requests with your api_key.
+    /// <code>
+    /// http://thecatapi.com/api/images/report?api_key=[YOUR-API-KEY]&sub_id=12345&image_id=8
+    /// </code>
+    /// </example>
+    public class Report : IApiGetRequest
+    {
+        public string api_key { get; set; }
+
+        /// <summary>
+        /// Unique id of the image to report
+        /// </summary>
+        public string image_id { get; set; }
+
+        /// <summary>
+        /// Any value you wish to associate with this, could be a unique id you have for one of your Users like a facebook id. This allows you to favourite this Image once per User.
+        /// </summary>
+        public string sub_id { get; set; }
+
+        /// <summary>
+        /// Any particular reason why it needs reporting, contains nothing but hippos, doesn't work etc
+        /// </summary>
+        public string reason { get; set; }
+
+        public string RequestUrl
+        {
+            get
+            {
+                var sb = new StringBuilder("http://thecatapi.com/api/images/report?");
+
+                // this is pretty much an all or nothing request. 
+                // we're just going to assume all of these properties are set
+                var paramList = new List<string>
+                {
+                    $"api_key={api_key}",
+                    $"api_key={image_id}",
+                    $"api_key={sub_id}",
+                    $"action={reason}"
+                };
+
+                if (!paramList.Any()) return sb.ToString();
+                sb.Append(string.Join("&", paramList));
+
+                return sb.ToString();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns a list of all the active categories.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// http://thecatapi.com/api/categories/list
+    /// </code>
+    /// </example>
+    public class GetList : IApiGetRequest
+    {
+        public string RequestUrl => "http://thecatapi.com/api/categories/list";
+    }
+
+    /// <summary>
+    /// This returns the total get requests/ votes/ favourites/ and images served for your account.
+    /// </summary>
+    /// <example>
+    /// This will return the overview of the stats for your account.
+    /// <code>
+    /// http://thecatapi.com/api/stats/getoverview?api_key=[YOUR-API-KEY]
+    /// </code>
+    /// </example>
+    public class GetOverview : IApiGetRequest
+    {
+        public string api_key { get; set; }
+
+        public string RequestUrl => $"http://thecatapi.com/api/stats/getoverview?api_key={api_key}";
+    }
 }
