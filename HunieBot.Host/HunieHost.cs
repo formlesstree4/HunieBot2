@@ -426,6 +426,12 @@ namespace HunieBot.Host
                 _commandPermissions = commandPermissions;
                 _logger = logger;
 
+                var blacklist = new HunieBlacklist();
+                blacklist.AddKey(_hba.Name);
+
+                if (blacklist.IsBlacklisted(_hba.Name))
+                    return;
+
                 // So, this instance is supposed to have some information.
                 // We're going to use some reflection magic on this instance
                 // to find all methods that are public that have the HandleEventAttribute
