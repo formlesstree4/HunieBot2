@@ -23,7 +23,7 @@ namespace RandomCatImage
         private static Dictionary<string, string> SupportedCatCommands
             => new Dictionary<string, string>
             {
-                {"-help", "`-help [-command command]` - gets help on commands and options"},
+                {"-help", ":grey_exclamation:`-help [-command command]` - gets help on commands and options"},
                 {
                     "-get", "`-get` - returns kitties\n" +
                             "options: \n" +
@@ -35,16 +35,16 @@ namespace RandomCatImage
                             "\t\t`-category n` - gets a cat in the category [n]\n" +
                             "\t\t`-size [small, med, full]` - gets a small (250x), medium (500x), or full (source) sized image"
                 },
-                {"-vote", "`-vote [-id #] [-score #]` - vote on a cat image with a score"},
-                {"-getvotes", "`-getvotes` - gets all your different votes"},
+                {"-vote", ":grey_exclamation:`-vote [id] [score]` - vote on a cat image with a score"},
+                {"-getvotes", ":grey_exclamation:`-getvotes` - gets all your different votes"},
                 {
                     "-favorite",
-                    "`-favorite [-'add' | -'remove'] [-id #]` - add/remove an image [id] from your favorites list"
+                    ":grey_exclamation:`-favorite [add | remove] [id]` - [add] or [remove] an image [id] from your favorites list"
                 },
-                {"-getfavorites", "`-getfavorites` - gets all your favorite images"},
+                {"-getfavorites", ":grey_exclamation:`-getfavorites` - gets all your favorite images"},
                 {
                     "-report",
-                    "`-report [-id #] [-reason \"your reason here\"]` - reports an image [id] with a [reason]. this will preveent this image from showing again"
+                    ":grey_exclamation:`-report [id] [reason]` - reports an image [id] with a [reason]. this will preveent this image from showing again"
                 },
                 {"-categories", "`-categories` - returns a list of all the active categories and their ids"},
                 {"-stats", "`-stats` - gets some statistics on this bot's usage of TheCatApi"}
@@ -64,41 +64,41 @@ namespace RandomCatImage
                         await command.Channel.SendMessage(RandomBasicResponse(command, logger));
                         return;
                     case "help":
-                        await command.User.SendMessage(HelpResponse(command, logger));
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: help```\n" + HelpResponse(command, logger));
                         return;
                     case "get":
-                        await command.Channel.SendMessage(GetResponse(command, logger));
+                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + GetResponse(command, logger));
                         return;
                     case "vote":
-                        await command.User.SendMessage(VoteResponse(command, logger));
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: vote```\n" + VoteResponse(command, logger));
                         break;
                     case "getvotes":
-                        await command.User.SendMessage(GetVotesResponse(command, logger));
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: getvotes```\n" + GetVotesResponse(command, logger));
                         break;
                     case "favorite":
-                        await command.User.SendMessage("not implemented");
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: favorite```\n" + FavouriteResponse(command, logger));
                         break;
                     case "getfavorites":
-                        await command.User.SendMessage("not implemented");
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: getfavorites```\n" + "not implemented");
                         break;
                     case "report":
-                        await command.User.SendMessage("not implemented");
+                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: report```\n" + "not implemented");
                         break;
                     case "categories":
-                        await command.Channel.SendMessage("not implemented");
+                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "not implemented");
                         break;
                     case "stats":
-                        await command.Channel.SendMessage("not implemented");
+                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "not implemented");
                         break;
                     default:
-                        await command.Channel.SendMessage("invalid command, try `cat -help`");
+                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "invalid command, try `cat -help`");
                         return;
                 }
             }
             catch (Exception e)
             {
-                logger.Debug($"RandomCatImage: {e.Message}");
-                await command.Channel.SendMessage($"RandomCatImage ran into an error: {e.Message}");
+                logger.Debug($"{nameof(RandomCatImage)}: {e.Message}");
+                await command.Channel.SendMessage($"```{nameof(RandomCatImage)} ran into an error:\n{e.Message}```");
             }
         }
 
@@ -112,11 +112,14 @@ namespace RandomCatImage
                     api_key = ApiKey,
                     sub_id = command.User.Id.ToString()
                 };
-                var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                var deserializedResponse =
-                    (GetResponse.response) xmlSerializer.Deserialize(response);
-                var imageData = deserializedResponse.data.images[0];
-                return $"{command.User.NicknameMention}\nid: `{imageData.id}`\nurl: {imageData.url}";
+
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                {
+                    var deserializedResponse =
+                        (GetResponse.response) xmlSerializer.Deserialize(response);
+                    var imageData = deserializedResponse.data.images[0];
+                    return $"{command.User.NicknameMention}\nid: `{imageData.id}`\nurl: {imageData.url}";
+                }
             }
         }
 
@@ -127,7 +130,7 @@ namespace RandomCatImage
             {
                 var messageLines = new List<string>
                 {
-                    "Pulls a random cat image from thecatapi.com",
+                    "Get kitties, vote on kitties, favorite kitties from thecatapi.com",
                     "Commands with :grey_exclamation: are sent back by PM"
                 };
                 messageLines.AddRange(from supportedCatCommand in SupportedCatCommands
@@ -175,9 +178,6 @@ namespace RandomCatImage
 
                         request.size = parameter.Value;
                         break;
-                    default:
-                        return
-                            $"{command.User.NicknameMention} invalid option `{parameter.Key}`! try 'cat -help -get' for more info";
                 }
             }
 
@@ -206,29 +206,35 @@ namespace RandomCatImage
                             request.results_per_page = resultsPerPage;
 
                             // get xml response and deserialize it to our object
-                            var response =
-                                new StringReader(webClient.DownloadString(request.RequestUrl));
-                            var deserializedResponse =
-                                (GetResponse.response) xmlSerializer.Deserialize(response);
-                            var images = deserializedResponse.data.images;
-
-                            // build our message using our xml response
-                            var messageTextLines = new List<string>
+                            using (var response =
+                                new StringReader(webClient.DownloadString(request.RequestUrl)))
                             {
-                                $"{resultsPerPage} cats requested by {command.User.NicknameMention}"
-                            };
-                            messageTextLines.AddRange(from image in images
-                                select $"id: `{image.id}`\nurl: {image.url}");
-                            return string.Join("\n", messageTextLines);
+                                var deserializedResponse =
+                                    (GetResponse.response) xmlSerializer.Deserialize(response);
+                                var images = deserializedResponse.data.images;
+
+
+                                // build our message using our xml response
+                                var messageTextLines = new List<string>
+                                {
+                                    $"{resultsPerPage} cats requested by {command.User.NicknameMention}"
+                                };
+                                messageTextLines.AddRange(from image in images
+                                    select $"id: `{image.id}`\nurl: {image.url}");
+
+                                return string.Join("\n", messageTextLines);
+                            }
                         }
                         case "id":
                         {
                             request.image_id = parameter.Value;
-                            var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                            var deserializedResponse =
-                                (GetResponse.response) xmlSerializer.Deserialize(response);
-                            var imageData = deserializedResponse.data.images[0];
-                            return $"{command.User.NicknameMention} {imageData.url}";
+                            using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                            {
+                                var deserializedResponse =
+                                    (GetResponse.response) xmlSerializer.Deserialize(response);
+                                var imageData = deserializedResponse.data.images[0];
+                                return $"{command.User.NicknameMention} {imageData.url}";
+                            }
                         }
                         default:
                             return $"{command.User.NicknameMention} type `.cat -help -get` for correct usage";
@@ -236,63 +242,47 @@ namespace RandomCatImage
                 }
 
                 // no count or id, just get a random cat with the optional options
-                var basicResponse = new StringReader(webClient.DownloadString(new GetCat().RequestUrl));
-                var deserializedBasicResponse =
-                    (GetResponse.response) xmlSerializer.Deserialize(basicResponse);
-                var basicImageData = deserializedBasicResponse.data.images[0];
-                return $"{command.User.NicknameMention}\nid: `{basicImageData.id}`\nurl: {basicImageData.url}";
+                using (var basicResponse = new StringReader(webClient.DownloadString(new GetCat().RequestUrl)))
+                {
+                    var deserializedBasicResponse =
+                        (GetResponse.response) xmlSerializer.Deserialize(basicResponse);
+                    var basicImageData = deserializedBasicResponse.data.images[0];
+                    return $"{command.User.NicknameMention}\nid: `{basicImageData.id}`\nurl: {basicImageData.url}";
+                }
             }
         }
 
         private static string VoteResponse(IHunieCommand command, ILogging logger)
         {
-
             var request = new Vote
             {
                 api_key = ApiKey,
-                sub_id = command.User.Id.ToString()
+                sub_id = command.User.Id.ToString(),
+                image_id = command.ParametersArray[1]
             };
 
-            // skip the first parameter "-vote"
-            foreach (
-                var parameter in
-                    command.Parameters.Where(parameter => parameter.Key != command.Parameters.Keys.FirstOrDefault())
-                )
-            {
-                switch (parameter.Key)
-                {
-                    case "id":
-                        request.image_id = parameter.Value;
-                        break;
-                    case "score":
-                        var score = 0;
-                        if (!int.TryParse(parameter.Value, out score)
+            var score = 0;
+            if (!int.TryParse(command.ParametersArray[2], out score)
                             || score < 1
                             || score > 10)
-                            return "invalid score! try `.cat -help -vote`";
-
-                        request.score = score;
-                        break;
-                    default:
-                        return
-                            $"{command.User.NicknameMention} invalid option `{parameter.Key}`! try 'cat -help -vote' for more info";
-                }
-            }
+                return "invalid score! try `.cat -help -vote`";
+            request.score = score;
 
             using (var webClient = new WebClient())
             {
                 var xmlSerializer = new XmlSerializer(typeof (VoteResponse.response));
-                var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                var deserializedResponse = (VoteResponse.response) xmlSerializer.Deserialize(response);
-                var voteData = deserializedResponse.data.votes.vote;
-                var messageLines = new List<string>
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
                 {
-                    $"```{nameof(RandomCatImage)}: vote```",
-                    $"```id: {voteData.image_id}",
-                    $"score: {voteData.score}",
-                    $"action: {voteData.action}```"
-                };
-                return string.Join("\n", messageLines);
+                    var deserializedResponse = (VoteResponse.response) xmlSerializer.Deserialize(response);
+                    var voteData = deserializedResponse.data.votes.vote;
+                    var messageLines = new List<string>
+                    {
+                        $"```id: {voteData.image_id}",
+                        $"score: {voteData.score}",
+                        $"action: {voteData.action}```"
+                    };
+                    return string.Join("\n", messageLines);
+                }
             }
         }
 
@@ -307,22 +297,23 @@ namespace RandomCatImage
             using (var webClient = new WebClient())
             {
                 var xmlSerializer = new XmlSerializer(typeof (GetVotesResponse.response));
-                var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                var deserializedResponse = (GetVotesResponse.response) xmlSerializer.Deserialize(response);
-                var voteData = deserializedResponse.data.images;
-
-                var messageLines = new List<string>
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
                 {
-                    $"```{nameof(RandomCatImage)}: getvotes```",
-                    $"```id: score"
-                };
-                messageLines.AddRange(from vote in voteData
-                    orderby vote.score
-                    select $"{vote.id}: {vote.score}"
-                    );
-                messageLines.Add("```");
+                    var deserializedResponse = (GetVotesResponse.response) xmlSerializer.Deserialize(response);
+                    var voteData = deserializedResponse.data.images;
 
-                return string.Join("\n", messageLines);
+                    var messageLines = new List<string>
+                    {
+                        $"```id: score"
+                    };
+                    messageLines.AddRange(from vote in voteData
+                        orderby vote.score
+                        select $"{vote.id}: {vote.score}"
+                        );
+                    messageLines.Add("```");
+
+                    return string.Join("\n", messageLines);
+                }
             }
         }
 
@@ -331,34 +322,19 @@ namespace RandomCatImage
             var request = new Favourite
             {
                 api_key = ApiKey,
-                sub_id = command.User.Id.ToString()
+                sub_id = command.User.Id.ToString(),
+                action = command.ParametersArray[1],
+                image_id = command.ParametersArray[2]
             };
-
-            foreach (
-                var parameter in
-                    command.Parameters.Where(parameter => parameter.Key != command.Parameters.Keys.FirstOrDefault())
-                )
-            {
-                switch (parameter.Key)
-                {
-                    case "add":
-                        request.action = parameter.Key;
-                        break;
-                    case "remove":
-                        request.action = parameter.Key;
-                        break;
-                    case "id":
-                        request.image_id = parameter.Key;
-                        break;
-                    default:
-                        return $"{command.User.NicknameMention} invalid option `{parameter.Key}`! try 'cat -help -favorite' for more info";
-                }
-            }
 
             using (var webClient = new WebClient())
             {
                 var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                return response.ToString();
+                var messageText = new List<string>
+                {
+                    $"{request.image_id} added to favorites list"
+                };
+                return string.Join("\n", messageText);
             }
         }
     }
