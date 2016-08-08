@@ -95,7 +95,7 @@ namespace HunieBot.Host
         public async Task Start()
         {
             await _discordClientConnection.Connect(Configuration.DiscordToken);
-            _discordClientConnection.SetGame($"I'm HunieBot! PM me \"{Configuration.CommandCharacter}help\" for more details!");
+            _discordClientConnection.SetGame(Configuration.Game);
         }
 
         /// <summary>
