@@ -345,7 +345,7 @@ namespace RandomCatImage
     /// http://thecatapi.com/api/categories/list
     /// </code>
     /// </example>
-    public class GetList : IApiGetRequest
+    public class Categories : IApiGetRequest
     {
         public string RequestUrl => "http://thecatapi.com/api/categories/list";
     }
@@ -359,7 +359,7 @@ namespace RandomCatImage
     /// http://thecatapi.com/api/stats/getoverview?api_key=[YOUR-API-KEY]
     /// </code>
     /// </example>
-    public class GetOverview : IApiGetRequest
+    public class Stats : IApiGetRequest
     {
         public string api_key { get; set; }
 

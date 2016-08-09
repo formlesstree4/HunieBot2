@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 
 namespace RandomCatImage
 {
+    // todo: get all the error responses from thecatapi somehow (not documented)
     [HunieBot(nameof(RandomCatImage))]
     public class RandomCatImage
     {
@@ -42,10 +43,10 @@ namespace RandomCatImage
                     ":grey_exclamation:`-favorite [add | remove] [id]` - [add] or [remove] an image [id] from your favorites list"
                 },
                 {"-getfavorites", ":grey_exclamation:`-getfavorites` - gets all your favorite images"},
-                {
-                    "-report",
-                    ":grey_exclamation:`-report [id] [reason]` - reports an image [id] with a [reason]. this will preveent this image from showing again"
-                },
+                //{ unsupported by api currently
+                //    "-report",
+                //    ":grey_exclamation:`-report [id] [\"reason\"]` - reports an image [id] with a [reason]. this will preveent this image from showing again"
+                //},
                 {"-categories", "`-categories` - returns a list of all the active categories and their ids"},
                 {"-stats", "`-stats` - gets some statistics on this bot's usage of TheCatApi"}
             };
@@ -64,34 +65,53 @@ namespace RandomCatImage
                         await command.Channel.SendMessage(RandomBasicResponse(command, logger));
                         return;
                     case "help":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: help```\n" + HelpResponse(command, logger));
+                        await command.User.SendMessage(
+                            $"```{nameof(RandomCatImage)}: help```\n" + 
+                            HelpResponse(command, logger));
                         return;
                     case "get":
-                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + GetResponse(command, logger));
+                        await command.Channel.SendMessage(
+                            $"```{nameof(RandomCatImage)}: get```\n" + 
+                            GetResponse(command, logger));
                         return;
                     case "vote":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: vote```\n" + VoteResponse(command, logger));
+                        await command.User.SendMessage(
+                            $"```{nameof(RandomCatImage)}: vote```\n" + 
+                            VoteResponse(command, logger));
                         break;
                     case "getvotes":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: getvotes```\n" + GetVotesResponse(command, logger));
+                        await command.User.SendMessage(
+                            $"```{nameof(RandomCatImage)}: getvotes```\n" + 
+                            GetVotesResponse(command, logger));
                         break;
                     case "favorite":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: favorite```\n" + FavouriteResponse(command, logger));
+                        await command.User.SendMessage(
+                            $"```{nameof(RandomCatImage)}: favorite```\n" + 
+                            FavouriteResponse(command, logger));
                         break;
                     case "getfavorites":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: getfavorites```\n" + "not implemented");
+                        await command.User.SendMessage(
+                            $"```{nameof(RandomCatImage)}: getfavorites```\n" + 
+                            GetFavouritesResponse(command, logger));
                         break;
-                    case "report":
-                        await command.User.SendMessage($"```{nameof(RandomCatImage)}: report```\n" + "not implemented");
-                        break;
+                    //case "report": unsupported by api currently
+                    //    await command.User.SendMessage
+                    //        ($"```{nameof(RandomCatImage)}: report```\n" +
+                    //        ReportResponse(command, logger));
+                    //    break;
                     case "categories":
-                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "not implemented");
+                        await command.Channel.SendMessage(
+                            $"```{nameof(RandomCatImage)}: categories```\n" +
+                            CategoriesResponse(command, logger));
                         break;
                     case "stats":
-                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "not implemented");
+                        await command.Channel.SendMessage(
+                            $"```{nameof(RandomCatImage)}: stats```\n" +
+                            StatsResponse(command, logger));
                         break;
                     default:
-                        await command.Channel.SendMessage($"```{nameof(RandomCatImage)}: get```\n" + "invalid command, try `cat -help`");
+                        await command.Channel.SendMessage(
+                            $"```{nameof(RandomCatImage)}: invalid command, try `cat -help```");
                         return;
                 }
             }
@@ -329,12 +349,118 @@ namespace RandomCatImage
 
             using (var webClient = new WebClient())
             {
-                var response = new StringReader(webClient.DownloadString(request.RequestUrl));
-                var messageText = new List<string>
+
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
                 {
-                    $"{request.image_id} added to favorites list"
-                };
-                return string.Join("\n", messageText);
+                    var messageText = new List<string>
+                    {
+                        $"{request.image_id} added to favorites list"
+                    };
+                    return string.Join("\n", messageText);
+                }
+            }
+        }
+
+        private static string GetFavouritesResponse(IHunieCommand command, ILogging logger)
+        {
+            var request = new GetFavourites
+            {
+                api_key = ApiKey,
+                sub_id = command.User.Id.ToString()
+            };
+
+            using (var webClient = new WebClient())
+            {
+                var xmlSerializer = new XmlSerializer(typeof(GetFavouritesResponse.response));
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                {
+                    var deserializedResponse = (GetFavouritesResponse.response) xmlSerializer.Deserialize(response);
+                    var images = deserializedResponse.data.images;
+
+                    var messageLines = new List<string>
+                    {
+                        $"```id: date"
+                    };
+                    messageLines.AddRange(from image in images
+                                          select $"{image.id}: {DateTime.Parse(image.created).ToUniversalTime()}");
+                    messageLines.Add("```");
+
+
+                    return string.Join("\n", messageLines);
+                }
+            }
+        }
+
+        private static string ReportResponse(IHunieCommand command, ILogging logger)
+        {
+            var request = new Report
+            {
+                api_key = ApiKey,
+                sub_id = command.User.Id.ToString(),
+                image_id = command.ParametersArray[1],
+                reason = command.ParametersArray[2]
+            };
+
+            using (var webClient = new WebClient())
+            {
+                //var xmlSerializer = new XmlSerializer(typeof(GetFavouritesResponse.response));
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                {
+                    return webClient.DownloadString(request.RequestUrl);
+                }
+            }
+        }
+
+        private static string CategoriesResponse(IHunieCommand command, ILogging logger)
+        {
+            var request = new Categories();
+            using (var webClient = new WebClient())
+            {
+                var xmlSerializer = new XmlSerializer(typeof(CategoriesResponse.response));
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                {
+                    var deserializedResponse = (CategoriesResponse.response) xmlSerializer.Deserialize(response);
+                    var categories = deserializedResponse.data.categories;
+
+                    var messageLines = new List<string>
+                    {
+                        $"{command.User.NicknameMention}",
+                        "```id: name"
+                    };
+                    messageLines.AddRange(from category in categories
+                                          select $"{category.id}: {category.name}");
+                    messageLines.Add("```");
+
+                    return string.Join("\n", messageLines);
+                }
+            }
+        }
+
+        private static string StatsResponse(IHunieCommand command, ILogging logger)
+        {
+            var request = new Stats
+            {
+                api_key = ApiKey
+            };
+
+            using (var webClient = new WebClient())
+            {
+                var xmlSerializer = new XmlSerializer(typeof(StatsResponse.response));
+                using (var response = new StringReader(webClient.DownloadString(request.RequestUrl)))
+                {
+                    var deserializedResponse = (StatsResponse.response)xmlSerializer.Deserialize(response);
+                    var stats = deserializedResponse.data.stats.statsoverview;
+
+                    var messageLines = new List<string>
+                    {
+                        $"{command.User.NicknameMention}",
+                        $"total favorites: {stats.total_favourites}",
+                        $"total cat requests: {stats.total_get_requests}",
+                        $"total votes: {stats.total_votes}",
+                    };
+
+                    return string.Join("\n", messageLines);
+                }
             }
         }
     }
