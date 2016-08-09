@@ -57,6 +57,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HunieBot.BlackJack\HunieBot.BlackJack.csproj">
+      <Project>{bad371bf-9306-424b-be0e-ec7025bc57ad}</Project>
+      <Name>HunieBot.BlackJack</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HunieBot.Danbooru\HunieBot.Danbooru.csproj">
+      <Project>{8d3e8a05-ea07-4c4d-9704-5f6b637ab3e4}</Project>
+      <Name>HunieBot.Danbooru</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HunieBot.DiceRoll\HunieBot.DiceRoll.csproj">
       <Project>{8513ddab-0879-4cf6-abfe-6209ab0925cf}</Project>
       <Name>HunieBot.DiceRoll</Name>
@@ -64,6 +72,10 @@
     <ProjectReference Include="..\HunieBot.Host\HunieBot.Host.csproj">
       <Project>{8d7e0c36-e16a-442f-ad6b-6e8b2d922b34}</Project>
       <Name>HunieBot.Host</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HunieBot.Magic8Ball\HunieBot.Magic8Ball.csproj">
+      <Project>{fbad43f8-db18-49c2-8b24-bff07ea355c3}</Project>
+      <Name>HunieBot.Magic8Ball</Name>
     </ProjectReference>
     <ProjectReference Include="..\HunieBot.MusicStream\HunieBot.MusicStream.csproj">
       <Project>{49fc8405-b200-4d38-b248-8498d068476c}</Project>
