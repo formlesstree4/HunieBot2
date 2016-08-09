@@ -57,9 +57,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HunieBot.Avatar\HunieBot.Avatar.csproj">
+      <Project>{749fa48c-9ad6-41ad-85bc-f4ba35376eb0}</Project>
+      <Name>HunieBot.Avatar</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HunieBot.BlackJack\HunieBot.BlackJack.csproj">
       <Project>{bad371bf-9306-424b-be0e-ec7025bc57ad}</Project>
       <Name>HunieBot.BlackJack</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HunieBot.Choice\HunieBot.Choose.csproj">
+      <Project>{eef186cb-6402-4c25-b926-03011474e622}</Project>
+      <Name>HunieBot.Choose</Name>
     </ProjectReference>
     <ProjectReference Include="..\HunieBot.Danbooru\HunieBot.Danbooru.csproj">
       <Project>{8d3e8a05-ea07-4c4d-9704-5f6b637ab3e4}</Project>
