@@ -78,22 +78,22 @@ namespace RandomCatImage
                         await command.User.SendMessage(
                             $"```{nameof(RandomCatImage)}: vote```\n" + 
                             VoteResponse(command, logger));
-                        break;
+                        return;
                     case "getvotes":
                         await command.User.SendMessage(
                             $"```{nameof(RandomCatImage)}: getvotes```\n" + 
                             GetVotesResponse(command, logger));
-                        break;
+                        return;
                     case "favorite":
                         await command.User.SendMessage(
                             $"```{nameof(RandomCatImage)}: favorite```\n" + 
                             FavouriteResponse(command, logger));
-                        break;
+                        return;
                     case "getfavorites":
                         await command.User.SendMessage(
                             $"```{nameof(RandomCatImage)}: getfavorites```\n" + 
                             GetFavouritesResponse(command, logger));
-                        break;
+                        return;
                     //case "report": unsupported by api currently
                     //    await command.User.SendMessage
                     //        ($"```{nameof(RandomCatImage)}: report```\n" +
@@ -103,12 +103,12 @@ namespace RandomCatImage
                         await command.Channel.SendMessage(
                             $"```{nameof(RandomCatImage)}: categories```\n" +
                             CategoriesResponse(command, logger));
-                        break;
+                        return;
                     case "stats":
                         await command.Channel.SendMessage(
                             $"```{nameof(RandomCatImage)}: stats```\n" +
                             StatsResponse(command, logger));
-                        break;
+                        return;
                     default:
                         await command.Channel.SendMessage(
                             $"```{nameof(RandomCatImage)}: invalid command, try `cat -help```");
