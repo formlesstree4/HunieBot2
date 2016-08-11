@@ -27,10 +27,9 @@ namespace HunieBot.Choice
                 await command.Channel.SendMessage($"{command.User.NicknameMention}\n{HelpText}");
                 return;
             }
-
-            // this is a little ugly, but i dont know a better way to do it
-            var rawParamString = string.Join(" ", command.ParametersArray);
-            var choices = rawParamString.Split(';');
+            
+            // todo: somehow get the actual command token. alternatively, command could have a (raw) string that is the whole message without the command token, the command name, and the trailing space
+            var choices = command.Message.Text.Replace($".{command.Command} ", "").Split(';');
 
             var rand = new Random();
             var choice = rand.Next(0, choices.Length - 1);
