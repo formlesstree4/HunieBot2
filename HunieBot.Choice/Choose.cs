@@ -14,10 +14,10 @@ namespace HunieBot.Choice
     {
         public static string HelpText = $"```{nameof(Choice)}: ?```\n" +
                                         "Give me a list of choices and I'll pick one for you!\n" +
-                                        "Usage: .choice [choice1; choice2; choice3; ...]";
+                                        "Usage: .choose|.choice [choice1; choice2; choice3; ...]";
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, true,
-            commands: "choose")]
+            commands: new [] { "choose", "choice"})]
         public async Task HandleCommand(IHunieCommand command, ILogging logger)
         {
             // no choices or we got a help option

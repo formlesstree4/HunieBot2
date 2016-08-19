@@ -26,18 +26,20 @@ namespace HunieBot.Avatar
                 targetUserId = targetUserId?.Replace("<", "");
                 targetUserId = targetUserId?.Replace("@", "");
                 targetUserId = targetUserId?.Replace(">", "");
-                if(string.IsNullOrWhiteSpace(targetUserId)) throw new Exception("invalid user id!");
-                var targetUser = command.Server.GetUser(ulong.Parse(targetUserId));
+                targetUserId = targetUserId?.Replace("!", "");
+                if (string.IsNullOrWhiteSpace(targetUserId)) throw new Exception("invalid user id!");
+                var parsedTargetUserId = ulong.Parse(targetUserId);
+                var targetUser = command.Server.GetUser(parsedTargetUserId);
 
                 // no nickname or we got a help option
                 if (command.ParametersArray.Length < 1
                     || (command.ParametersArray.Length == 1 && command.ParametersArray.FirstOrDefault() == "?"))
                 {
-                    await command.Channel.SendMessage($"{command.User.NicknameMention}\n{HelpText}");
+                    await command.Channel.SendMessage($"{command.User.Mention}\n{HelpText}");
                     return;
                 }
 
-                await command.Channel.SendMessage($"{command.User.NicknameMention}\n" +
+                await command.Channel.SendMessage($"{command.User.Mention}\n" +
                                                   $"{targetUser.Name}'s avatar: {targetUser.AvatarUrl}");
             }
             catch (Exception e)
