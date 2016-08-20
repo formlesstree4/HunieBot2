@@ -1,13 +1,10 @@
 ﻿using Discord;
-using Fclp;
 using HunieBot.Host.Interfaces;
+using HunieBot.Host.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
-using HunieBot.Host.Internal;
-using Fclp.Internals;
-using Fclp.Internals.Parsing;
 
 namespace HunieBot.Host
 {
@@ -37,7 +34,7 @@ namespace HunieBot.Host
         public string[] RawParametersArray { get; }
 
         public Parameters Parameters { get; }
-        
+
         public HunieCommand(Channel c, Server s, User u, DiscordClient dc, Message m)
         {
             Channel = c;
@@ -67,14 +64,18 @@ namespace HunieBot.Host
         public HunieCommand(IHunieMessage message) : this(message.Channel, message.Server, message.User, message.Client, message.Message) { }
 
 
-        private Dictionary<string, string> ConvertArrayToParameters(string[] array)
+
+
+        /// <summary>
+        ///     This is where the magic happens. So, here's how we're going to do this.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        private Dictionary<string, object> ConvertArrayToParameters(string[] array)
         {
-            // we're going to use a naive implementation.
-            // if idx % 2 == 0, key
-            // if idx % 2 != 0, value
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             var currentParameter = "";
-            var currentParameterValues = new List<string>();
+            var currentParameterValues = new List<object>();
             foreach (var item in array)
             {
                 if(item[0] == ParamsIndicator)
@@ -96,19 +97,22 @@ namespace HunieBot.Host
             return dict;
         }
 
+
+
+
     }
 
 
-    public sealed class Parameters : IReadOnlyDictionary<string, string>
+    public sealed class Parameters : IReadOnlyDictionary<string, object>
     {
-        private readonly IDictionary<string, string> _parameters;
+        private readonly IDictionary<string, object> _parameters;
 
-        public Parameters(IDictionary<string, string> parameters)
+        public Parameters(IDictionary<string, object> parameters)
         {
             _parameters = parameters;
         }
 
-        public string this[string key]
+        public object this[string key]
         {
             get
             {
@@ -116,7 +120,7 @@ namespace HunieBot.Host
             }
         }
 
-        public string this[params string[] keys]
+        public object this[params string[] keys]
         {
             get
             {
@@ -144,7 +148,7 @@ namespace HunieBot.Host
             }
         }
 
-        public IEnumerable<string> Values
+        public IEnumerable<object> Values
         {
             get
             {
@@ -157,19 +161,19 @@ namespace HunieBot.Host
             return _parameters.ContainsKey(key);
         }
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
             return _parameters.GetEnumerator();
         }
 
-        public bool TryGetValue(string key, out string value)
+        public bool TryGetValue(string key, out object value)
         {
             return _parameters.TryGetValue(key, out value);
         }
 
-        public Option<string> GetIfExists(string key)
+        public Option<object> GetIfExists(string key)
         {
-            string v;
+            object v;
             if (TryGetValue(key, out v)) return v;
             return Option.Empty;
         }

@@ -18,7 +18,7 @@ namespace HunieBot.Host.Interfaces
         ///     Gets the parameters of the command that were passed in.
         /// </summary>
         /// <remarks>
-        ///     Parsed from <see cref="Discord.Message.Text"/>
+        ///     Parsed from <see cref="Message.Text"/>
         /// </remarks>
         string[] ParametersArray { get; }
 
@@ -26,12 +26,12 @@ namespace HunieBot.Host.Interfaces
         ///     Gets the parameters of the command that were passed in.
         /// </summary>
         /// <remarks>
-        ///     Parsed from <see cref="Discord.Message.RawText"/>
+        ///     Parsed from <see cref="Message.RawText"/>
         /// </remarks>
         string[] RawParametersArray { get; }
 
         /// <summary>
-        ///     Gets a specially parsed <see cref="HunieBot.Host.Parameters"/> object.
+        ///     Gets a specially parsed <see cref="Host.Parameters"/> object.
         /// </summary>
         Parameters Parameters { get; }
 

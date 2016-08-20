@@ -20,11 +20,11 @@ namespace HunieBot.Danbooru
             _api = new BooruApi();
         }
 
-        [HandleCommand(CommandEvent.AnyMessageReceived | CommandEvent.CommandReceived, UserPermissions.User, true, "booru")]
+        [HandleCommand(CommandEvent.AnyMessageReceived | CommandEvent.CommandReceived, UserPermissions.User, true, "booru", "b")]
         public async Task Search(IHunieCommand command)
         {
             var p = command.Parameters;
-            var tags = p["tags", "t"];
+            var tags = p["tags", "t"].Trim('"');
             var ccount = p["count", "c"];
             var coffset = p["page", "p"];
             int count, offset;

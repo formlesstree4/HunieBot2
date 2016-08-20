@@ -702,12 +702,15 @@ namespace HunieBot.Host
         {
             return new HunieEvent(args.After, args.Server, null, c);
         }
-        public static IEnumerable<string> ParseParameters(this string p)
+        public static IEnumerable<string> ParseParameters(this string p, bool keepDoubleQuotes = false)
         {
             return p.Split('"')
                 .Select((element, index) => index % 2 == 0
                     ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                    : new[] { element })
+                    : new[]
+                    {
+                        keepDoubleQuotes ? $"\"{element}\"" : element
+                    })
                 .SelectMany(element => element).ToList();
         }
     }
