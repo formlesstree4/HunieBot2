@@ -71,11 +71,11 @@ namespace HunieBot.Host
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        private Dictionary<string, object> ConvertArrayToParameters(string[] array)
+        private Dictionary<string, string> ConvertArrayToParameters(string[] array)
         {
-            var dict = new Dictionary<string, object>();
+            var dict = new Dictionary<string, string>();
             var currentParameter = "";
-            var currentParameterValues = new List<object>();
+            var currentParameterValues = new List<string>();
             foreach (var item in array)
             {
                 if(item[0] == ParamsIndicator)
@@ -103,16 +103,16 @@ namespace HunieBot.Host
     }
 
 
-    public sealed class Parameters : IReadOnlyDictionary<string, object>
+    public sealed class Parameters : IReadOnlyDictionary<string, string>
     {
-        private readonly IDictionary<string, object> _parameters;
+        private readonly IDictionary<string, string> _parameters;
 
-        public Parameters(IDictionary<string, object> parameters)
+        public Parameters(IDictionary<string, string> parameters)
         {
             _parameters = parameters;
         }
 
-        public object this[string key]
+        public string this[string key]
         {
             get
             {
@@ -120,7 +120,7 @@ namespace HunieBot.Host
             }
         }
 
-        public object this[params string[] keys]
+        public string this[params string[] keys]
         {
             get
             {
@@ -148,7 +148,7 @@ namespace HunieBot.Host
             }
         }
 
-        public IEnumerable<object> Values
+        public IEnumerable<string> Values
         {
             get
             {
@@ -161,19 +161,19 @@ namespace HunieBot.Host
             return _parameters.ContainsKey(key);
         }
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
             return _parameters.GetEnumerator();
         }
 
-        public bool TryGetValue(string key, out object value)
+        public bool TryGetValue(string key, out string value)
         {
             return _parameters.TryGetValue(key, out value);
         }
 
-        public Option<object> GetIfExists(string key)
+        public Option<string> GetIfExists(string key)
         {
-            object v;
+            string v;
             if (TryGetValue(key, out v)) return v;
             return Option.Empty;
         }

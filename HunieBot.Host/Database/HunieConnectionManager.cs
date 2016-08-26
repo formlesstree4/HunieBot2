@@ -22,7 +22,7 @@ namespace HunieBot.Host.Database
         ///     Creates a new instance of the <see cref="HunieConnectionManager"/>
         /// </summary>
         /// <param name="dbLocation">The location of the database</param>
-        public HunieConnectionManager(string dbLocation)
+        internal HunieConnectionManager(string dbLocation)
         {
             _connectionString = $"Data Source={dbLocation};Version=3";
             if(!File.Exists(dbLocation)) SetupDatabase(dbLocation);

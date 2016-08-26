@@ -1,4 +1,5 @@
 ﻿using HunieBot.Host.Attributes;
+using HunieBot.Host.Database;
 using HunieBot.Host.Enumerations;
 using HunieBot.Host.Interfaces;
 using System;
@@ -16,6 +17,7 @@ namespace HunieBot.DiceRoll
     public sealed class DiceRoll
     {
         private readonly int MaxIterations = 10;
+
 
         [HandleCommand(CommandEvent.CommandReceived | CommandEvent.AnyMessageReceived, UserPermissions.User, false, "roll")]
         public async Task HandleDiceRoll(IHunieCommand command, ILogging logger)
