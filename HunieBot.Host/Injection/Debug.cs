@@ -1,5 +1,4 @@
 ﻿using HunieBot.Host.Injection.Implementations.Logging;
-using HunieBot.Host.Injection.Implementations.Permissions;
 using HunieBot.Host.Interfaces;
 using Ninject.Modules;
 

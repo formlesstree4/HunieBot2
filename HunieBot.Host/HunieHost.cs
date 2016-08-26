@@ -9,6 +9,7 @@ using Ninject;
 using Ninject.Injection;
 using Ninject.Modules;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -26,12 +27,7 @@ namespace HunieBot.Host
     {
         private readonly static string HunieBotDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HunieBot");
         private readonly static string DatabaseFile = Path.Combine(HunieBotDataFolder, "huniebot.sqlite");
-
-        // private readonly static string ConfigurationFile = Path.Combine(HunieBotDataFolder, "configuration.json");
-        // private readonly static string UserPermissionsFile = Path.Combine(HunieBotDataFolder, "userpermissions.json");
-        // private readonly static string CommandPermissionsFile = Path.Combine(HunieBotDataFolder, "commandpermissions.json");
-
-
+        private readonly ConcurrentDictionary<Type, HunieConnectionManager> _managers = new ConcurrentDictionary<Type, HunieConnectionManager>();
         private readonly IHunieCommandPermissions _commandPermissions;
         private readonly IHunieUserPermissions _userPermissions;
         private readonly INinjectModule _loadedModule;
@@ -39,6 +35,7 @@ namespace HunieBot.Host
         private readonly ILogging _logger;
         private readonly IList<HunieWrapper> _wrappers;
         private readonly DiscordClient _discordClientConnection;
+        private readonly HunieConnectionManager _mainConnection;
 
 
 
@@ -69,13 +66,25 @@ namespace HunieBot.Host
 
             // Let's make sure our appdata directory exists!
             if (!Directory.Exists(HunieBotDataFolder)) Directory.CreateDirectory(HunieBotDataFolder);
-
+            _mainConnection = new HunieConnectionManager(DatabaseFile);
             _discordClientConnection = new DiscordClient(dc);
             _ninject = new StandardKernel(_loadedModule);
-            _ninject.Bind<HunieConnectionManager>().ToConstant(new HunieConnectionManager(DatabaseFile));
-            _ninject.Bind<IHunieCommandPermissions>().ToConstant(new HunieCommandPermissions(_ninject.Get<HunieConnectionManager>()));
-            _ninject.Bind<IHunieUserPermissions>().ToConstant(new HunieUserPermissions(_ninject.Get<HunieConnectionManager>()));
+            _ninject.Bind<IHunieCommandPermissions>().ToConstant(new HunieCommandPermissions(_mainConnection));
+            _ninject.Bind<IHunieUserPermissions>().ToConstant(new HunieUserPermissions(_mainConnection));
             _ninject.Bind<DiscordClient>().ToConstant(_discordClientConnection);
+            _ninject.Bind<HunieConnectionManager>().ToMethod(c =>
+            {
+                var type = c.Request.Target?.Member?.DeclaringType;
+                if (type == null) return null;
+                return _managers.GetOrAdd(type, (t) =>
+                {
+                    var typeName = t.Name;
+                    var dir = Path.Combine(HunieBotDataFolder, typeName);
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                    var file = Path.Combine(dir, $"{typeName}.sqlite");
+                    return new HunieConnectionManager(file);
+                });
+            });
             _logger = _ninject.Get<ILogging>();
             _userPermissions = _ninject.Get<IHunieUserPermissions>();
             _commandPermissions = _ninject.Get<IHunieCommandPermissions>();
