@@ -54,7 +54,7 @@ namespace HunieBot.Host
             var clnParamsParsed = clnParams.ParseParameters();
             var rawParamsParsed = rawParams.ParseParameters();
 
-            Command = cleanedRegText.First();
+            Command = cleanedRegText.FirstOrDefault();
             ParametersArray = clnParams.ParseParameters().ToArray();
             RawParametersArray = rawParams.ParseParameters().ToArray();
             Parameters = new Parameters(ConvertArrayToParameters(rawParamsParsed.ToArray()));

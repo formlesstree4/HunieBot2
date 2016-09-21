@@ -34,13 +34,13 @@ namespace HunieBot.DiceRoll
                 var calculated = new List<long>();
                 try
                 {
-                    current = new DiceExpression(currentRoll, DiceExpressionOptions.SimplifyStringValue);
+                    current = new DiceExpression(currentRoll, DiceExpressionOptions.None);
                 }
                 catch (ArgumentException)
                 {
                     return;
                 }
-                diceMessageBuilder.AppendLine(current.ToString());
+                diceMessageBuilder.AppendLine($"{command.User.Mention}: {current.ToString()}");
                 foreach (var expression in current.Expressions)
                 {
                     var expValue = expression.Key * expression.Value.Evaluate();

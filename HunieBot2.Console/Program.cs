@@ -20,12 +20,16 @@ namespace HunieBot2.Console
                     if (System.Console.ReadLine().ToLower() != "y")
                         return;
                     System.Console.WriteLine("Please enter your token below: ");
-                    hunieHost.Configuration.DiscordToken = System.Console.ReadLine();
+                    hunieHost.Configuration.DiscordToken = $"Bot {System.Console.ReadLine()}";
                     System.Console.WriteLine("Please enter your title: ");
                     hunieHost.Configuration.Game = System.Console.ReadLine();
                     System.Console.WriteLine("Please enter your preferred prefix key: ");
                     hunieHost.Configuration.CommandCharacter = Convert.ToChar(System.Console.ReadLine());
                     hunieHost.Configuration.Save(ConfigurationFile);
+                }
+                else
+                {
+                    if (!hunieHost.Configuration.DiscordToken.StartsWith("Bot", StringComparison.OrdinalIgnoreCase)) hunieHost.Configuration.DiscordToken = $"Bot {hunieHost.Configuration.DiscordToken}";
                 }
                 hunieHost.Start().Wait();
                 System.Console.ReadLine();
