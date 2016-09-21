@@ -28,7 +28,7 @@ namespace HunieBot.WeatherForecast
                 //logger.Trace($"Got weather info: \n{request}");
                 var deserializedRequest = JsonConvert.DeserializeObject<OpenWeatherMapResponse>(request);
 
-                var messageTitle = $"{deserializedRequest.GetWeatherEmoji} __**Weather** for {deserializedRequest.name}__";
+                var messageTitle = $"{deserializedRequest.GetWeatherEmoji} __**Weather** for {deserializedRequest.name}, {deserializedRequest.sys.country}__";
                 var messageTemp =
                     $"{deserializedRequest.main.tempInCelcius:N2}°C / {deserializedRequest.main.tempInFahrenheit:N2}°F, '{deserializedRequest.weather[0].description}'";
                 var messageCloud = $"{deserializedRequest.clouds.all}% Clouds, Windspeed {deserializedRequest.wind.speed}m/s";
