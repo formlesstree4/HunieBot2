@@ -49,7 +49,7 @@ namespace HunieBot.Host
 
             var hc = JsonConvert.DeserializeObject<HunieConfiguration>(configFile);
             CommandCharacter = hc.CommandCharacter;
-            DiscordToken = hc.DiscordToken;
+            DiscordToken = hc.DiscordToken.StartsWith("Bot ") ? hc.DiscordToken.Remove(0, 4) : hc.DiscordToken;
             Game = hc.Game;
         }
 

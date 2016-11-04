@@ -103,7 +103,7 @@ namespace HunieBot.Host
         /// <returns>A promise to start <see cref="HunieHost"/></returns>
         public async Task Start()
         {
-            await _discordClientConnection.Connect(Configuration.DiscordToken);
+            await _discordClientConnection.Connect(Configuration.DiscordToken, TokenType.Bot);
             _discordClientConnection.SetGame(Configuration.Game);
         }
 
