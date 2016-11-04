@@ -32,7 +32,7 @@ namespace HunieBot.Choice
             var choices = command.Message.Text.Replace($".{command.Command} ", "").Split(';');
 
             var rand = new Random();
-            var choice = rand.Next(0, choices.Length - 1);
+            var choice = rand.Next(choices.Length);
 
             await command.Channel.SendMessage($"{command.User.NicknameMention}\n" +
                 $"Between {string.Join("; ", choices)}...\n" +
