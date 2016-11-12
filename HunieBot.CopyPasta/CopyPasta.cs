@@ -16,6 +16,8 @@ namespace HunieBot.CopyPasta
     {
         private IEnumerable<Pasta> _pastaData;
 
+        private const int MaxDiscordMessageLength = 2000;
+        private const int MaxPastaListPageLength = MaxDiscordMessageLength - 200;
         private const char PastaEchoCommandToken = '~';
         private const string SavedPastasFileName = "copypasta.json";
 
@@ -26,7 +28,7 @@ namespace HunieBot.CopyPasta
                                                   "Usage:\n" +
                                                   "\t`.pasta|.meme [pasta_name] [pasta_text]` - Creates a new (or overwrites an existing) copypasta `pasta_name` with `pasta_text`\n" +
                                                   "\t`.pasta|.meme [pasta_name]` - removes copypasta with `pasta_name`\n" +
-                                                  "\t`.pasta|.meme -list` - PMs you the list of currently saved copypastas\n" +
+                                                  "\t`.pasta|.meme -list [page #]` - lists currently saved pastas by page (or nothing to get all)\n" +
                                                   "To make me echo a copypasta, use `~pasta_name`";
 
         private IEnumerable<Pasta> PastaData
@@ -93,21 +95,37 @@ namespace HunieBot.CopyPasta
         {
             try
             {
+                // todo: make it paginate perfectly
                 if (command.Parameters.Keys.FirstOrDefault() == "list")
                 {
-                    var messageLines = new List<string>
-                            {
-                                $"```{nameof(CopyPasta)}: -list"
-                            };
+
+                    var messageLines = new List<string>();
 
                     var pastaList = from pasta in PastaData
                         where pasta.ServerId == command.Server.Id
-                        select pasta.PastaContent;
+                        select $"{pasta.PastaName} - {pasta.PastaContent}";
                     
                     messageLines.AddRange(pastaList);
-                    messageLines.Add("```");
 
-                    await command.User.SendMessage(string.Join("\n", messageLines));
+                    var fullMessage = string.Join("\n\n", messageLines);
+                    if (fullMessage.Length < MaxDiscordMessageLength)
+                    {
+                        await command.User.SendMessage(fullMessage);
+                        return;
+                    }
+
+                    var page = int.MinValue;
+                    if (!int.TryParse(command.Parameters.Values.FirstOrDefault(), out page))
+                    {
+                        await command.User.SendMessage(HelpText);
+                        return;
+                    }
+
+                    var paginatedMessage = $"List of copypastas for {command.Server.Name}\n```" + string.Join("", fullMessage.Skip(page * MaxPastaListPageLength).Take(MaxPastaListPageLength));
+                    var pageCount = Math.Ceiling((float) fullMessage.Length / MaxPastaListPageLength);
+                    paginatedMessage += $"```\n\npage {page}/{pageCount}";
+
+                    await command.User.SendMessage(paginatedMessage);
                     return;
                 }
 
