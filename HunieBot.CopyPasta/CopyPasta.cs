@@ -103,11 +103,12 @@ namespace HunieBot.CopyPasta
 
                     var pastaList = from pasta in PastaData
                         where pasta.ServerId == command.Server.Id
-                        select $"{pasta.PastaName} - {pasta.PastaContent}";
+                        orderby pasta.PastaName
+                        select pasta.PastaName;
                     
                     messageLines.AddRange(pastaList);
 
-                    var fullMessage = string.Join("\n\n", messageLines);
+                    var fullMessage = string.Join("\n", messageLines);
                     if (fullMessage.Length < MaxDiscordMessageLength)
                     {
                         await command.User.SendMessage(fullMessage);
@@ -115,14 +116,11 @@ namespace HunieBot.CopyPasta
                     }
 
                     var page = int.MinValue;
-                    if (!int.TryParse(command.Parameters.Values.FirstOrDefault(), out page))
-                    {
-                        await command.User.SendMessage(HelpText);
-                        return;
-                    }
+                    if (!int.TryParse(command.Parameters.Values.FirstOrDefault(), out page) || page < 1)
+                        page = 1;
 
-                    var paginatedMessage = $"List of copypastas for {command.Server.Name}\n```" + string.Join("", fullMessage.Skip(page * MaxPastaListPageLength).Take(MaxPastaListPageLength));
-                    var pageCount = Math.Ceiling((float) fullMessage.Length / MaxPastaListPageLength);
+                    var paginatedMessage = $"List of copypastas for {command.Server.Name}\n```" + string.Join("", fullMessage.Skip((page - 1) * MaxPastaListPageLength).Take(MaxPastaListPageLength));
+                    var pageCount = Math.Ceiling((float) fullMessage.Length / MaxPastaListPageLength) + 1;
                     paginatedMessage += $"```\n\npage {page}/{pageCount}";
 
                     await command.User.SendMessage(paginatedMessage);
